@@ -1,7 +1,6 @@
 const HEIGHT = 3;
 const WIDTH = 5;
-const STARTLEN = 4;
-const STARTLOC = [HEIGHT / 2];
+const SNAKESTARTLEN = 3;
 const app = {};
 
 //cached elements
@@ -23,14 +22,14 @@ const addBoardBorders = (box, x, y) => {
   return box;
 };
 
-const initializeTable = () => {
+const renderTable = () => {
   app.grid.forEach((modelRow, i) => {
     const row = document.createElement("tr");
     row.setAttribute("data-row", i);
     modelRow.forEach((value, j) => {
       const box = document.createElement("td");
       box.setAttribute("data-col", j);
-      box.setAttribute("data-state", value);
+      box.setAttribute("class", value);
       row.append(addBoardBorders(box, i, j));
     });
     table.append(row);
@@ -39,16 +38,47 @@ const initializeTable = () => {
 
 const initializeGrid = () => {
   const grid = [];
-  for (i = 0; i < HEIGHT; i++) {
+  for (let i = 0; i < HEIGHT; i++) {
     const row = [];
-    for (j = 0; j < WIDTH; j++) {
-      row.push(0);
+    for (let j = 0; j < WIDTH; j++) {
+      row.push("blank");
     }
     grid.push(row);
   }
   app["grid"] = grid;
-  console.log(app.grid);
+};
+
+const initializeSnake = () => {
+  x = Math.floor(HEIGHT / 2);
+  y = Math.ceil(WIDTH / 2);
+  app.grid[x][y] = "snake-head";
+  for (let i = 1; i < SNAKESTARTLEN; i++) {
+    app.grid[x][y - i] = "snake-body";
+  }
+};
+
+const countBlanks = (grid) => {
+  const blanks = grid.reduce((accumulator, currentArray) => {
+    accumulator += currentArray.reduce((accumulator, currentValue) => {
+      if (currentValue === "blank") {
+        accumulator += 1;
+      }
+      return accumulator;
+    }, 0);
+    return accumulator;
+  }, 0);
+  return blanks;
+};
+
+const generateFood = () => {
+  //count number of empty spaces
+  const blanks = countBlanks(app.grid);
+  console.log(blanks);
+  //randomly choose a number
+  //place that as an empty space
 };
 
 initializeGrid();
-initializeTable();
+initializeSnake();
+renderTable();
+generateFood();
