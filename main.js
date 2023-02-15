@@ -1,6 +1,7 @@
-const HEIGHT = 3;
-const WIDTH = 5;
+const HEIGHT = 20;
+const WIDTH = 30;
 const SNAKESTARTLEN = 3;
+const GRIDSIZE = 7;
 const app = {};
 
 //cached elements
@@ -25,11 +26,11 @@ const addBoardBorders = (box, x, y) => {
 const renderTable = () => {
   app.grid.forEach((modelRow, i) => {
     const row = document.createElement("tr");
-    row.setAttribute("data-row", i);
     modelRow.forEach((value, j) => {
       const box = document.createElement("td");
-      box.setAttribute("data-col", j);
       box.setAttribute("class", value);
+      box.style.height = `${GRIDSIZE}px`;
+      box.style.width = `${GRIDSIZE}px`;
       row.append(addBoardBorders(box, i, j));
     });
     table.append(row);
@@ -49,11 +50,11 @@ const initializeGrid = () => {
 };
 
 const initializeSnake = () => {
-  x = Math.floor(HEIGHT / 2);
-  y = Math.ceil(WIDTH / 2);
-  app.grid[x][y] = "snake-head";
+  const snakeheadRow = Math.floor(HEIGHT / 2);
+  const snakeheadCol = Math.ceil(WIDTH / 2);
+  app.grid[snakeheadRow][snakeheadCol] = "snake-head";
   for (let i = 1; i < SNAKESTARTLEN; i++) {
-    app.grid[x][y - i] = "snake-body";
+    app.grid[snakeheadRow][snakeheadCol - i] = "snake-body";
   }
 };
 
@@ -73,12 +74,13 @@ const findBlanks = (grid) => {
 
 const generateFood = () => {
   const blanks = findBlanks(app.grid);
-  console.log(blanks);
 
-  let foodPos = Math.floor(Math.random() * blanks); //referenced from https://www.w3schools.com/js/js_random.asp
-  console.log(foodPos);
+  const newFoodIndex = Math.floor(Math.random() * blanks.length); //referenced from https://www.w3schools.com/js/js_random.asp
 
   // figure out how to place the food at the right position
+  const newFoodRow = blanks[newFoodIndex][0];
+  const newFoodCol = blanks[newFoodIndex][1];
+  app.grid[newFoodRow][newFoodCol] = "food";
 };
 
 initializeGrid();
