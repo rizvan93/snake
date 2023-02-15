@@ -8,11 +8,13 @@ const app = {};
 const table = document.querySelector("table");
 
 const addBoardBorders = (box, x, y) => {
+  x = parseInt(x);
   if (x === 0) {
     box.style.borderTopColor = "black";
   } else if (x === HEIGHT - 1) {
     box.style.borderBottomColor = "black";
   }
+  y = parseInt(y);
   if (y === 0) {
     box.style.borderLeftColor = "black";
   } else if (y === WIDTH - 1) {
@@ -22,19 +24,20 @@ const addBoardBorders = (box, x, y) => {
 };
 
 const initializeTable = () => {
-  for (i in app.grid) {
+  app.grid.forEach((modelRow, i) => {
     const row = document.createElement("tr");
     row.setAttribute("data-row", i);
-    for (j in app.grid[i]) {
+    modelRow.forEach((value, j) => {
       const box = document.createElement("td");
       box.setAttribute("data-col", j);
-      row.append(addBoardBorders(box, parseInt(i), parseInt(j)));
-    }
+      box.setAttribute("data-state", value);
+      row.append(addBoardBorders(box, i, j));
+    });
     table.append(row);
-  }
+  });
 };
 
-const initialize = () => {
+const initializeGrid = () => {
   const grid = [];
   for (i = 0; i < HEIGHT; i++) {
     const row = [];
@@ -47,5 +50,5 @@ const initialize = () => {
   console.log(app.grid);
 };
 
-initialize();
+initializeGrid();
 initializeTable();
