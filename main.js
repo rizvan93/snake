@@ -57,28 +57,31 @@ const initializeSnake = () => {
   }
 };
 
-const countBlanks = (grid) => {
-  const blanks = grid.reduce((accumulator, currentArray) => {
-    accumulator += currentArray.reduce((accumulator, currentValue) => {
-      if (currentValue === "blank") {
-        accumulator += 1;
-      }
+//returns an array of blanks [x-position, y-position] on an input grid
+const findBlanks = (grid) => {
+  return grid.reduce((accumulator, currentArray, row) => {
+    const indexesInRow = currentArray.reduce((accumulator, value, index) => {
+      if (value === "blank") accumulator.push(index);
       return accumulator;
-    }, 0);
+    }, []);
+    indexesInRow.forEach((index) => {
+      accumulator.push([row, index]);
+    });
     return accumulator;
-  }, 0);
-  return blanks;
+  }, []);
 };
 
 const generateFood = () => {
-  //count number of empty spaces
-  const blanks = countBlanks(app.grid);
+  const blanks = findBlanks(app.grid);
   console.log(blanks);
-  //randomly choose a number
-  //place that as an empty space
+
+  let foodPos = Math.floor(Math.random() * blanks); //referenced from https://www.w3schools.com/js/js_random.asp
+  console.log(foodPos);
+
+  // figure out how to place the food at the right position
 };
 
 initializeGrid();
 initializeSnake();
-renderTable();
 generateFood();
+renderTable();

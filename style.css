@@ -25,3 +25,7 @@ td {
 .snake-body {
   background-color: grey;
 }
+
+.food {
+  background-color: blue;
+}
