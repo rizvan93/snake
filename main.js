@@ -1,9 +1,10 @@
-const HEIGHT = 5;
-const WIDTH = 8;
+const HEIGHT = 15;
+const WIDTH = 20;
 const SNAKESTARTLEN = 3;
 const GRIDSIZE = 20;
 const app = {
   speed: 1000,
+  direction: [0, 1],
 };
 
 //cached elements
@@ -61,8 +62,18 @@ const initializeSnake = () => {
   placeSnakeOnGrid(app.snake);
 };
 
+const refreshSnake = () => {
+  app.grid.forEach((row, i) => {
+    row.forEach((tile, j) => {
+      if (tile === "snake") {
+        app.grid[i][j] = "blank";
+      }
+    });
+  });
+  placeSnakeOnGrid(app.snake);
+};
+
 const placeSnakeOnGrid = (snake) => {
-  console.log(snake);
   app.grid[snake.position[0]][snake.position[1]] = "snake";
   if (snake.next) {
     placeSnakeOnGrid(snake.next);
@@ -93,15 +104,64 @@ const findItems = (grid, item) => {
 
 const generateFood = () => {
   const blanks = findItems(app.grid, "blank");
+  if (blanks[0]) {
+    const newFoodIndex = Math.floor(Math.random() * blanks.length); //referenced from https://www.w3schools.com/js/js_random.asp
 
-  const newFoodIndex = Math.floor(Math.random() * blanks.length); //referenced from https://www.w3schools.com/js/js_random.asp
+    const newFoodRow = blanks[newFoodIndex][0];
+    const newFoodCol = blanks[newFoodIndex][1];
+    app.grid[newFoodRow][newFoodCol] = "food";
+  } else {
+    console.log("win condition");
+  }
+};
 
-  const newFoodRow = blanks[newFoodIndex][0];
-  const newFoodCol = blanks[newFoodIndex][1];
-  app.grid[newFoodRow][newFoodCol] = "food";
+const removeTail = (snake) => {
+  if (snake.next.next) {
+    removeTail(snake.next);
+  } else {
+    snake.next = 0;
+  }
+};
+
+const moveHeadTo = (direction) => {
+  //create new snake head item
+  const newSnakehead = {
+    position: [
+      app.snake.position[0] + direction[0],
+      app.snake.position[1] + direction[1],
+    ],
+    next: app.snake,
+  };
+  //link previous snake to new snake head
+  app.snake = newSnakehead;
 };
 
 const moveSnake = () => {
+  //determine direction of travel (assume right for now)
+  const direction = [0, 1];
+
+  //determine next tile
+  const nextTile =
+    app.grid[app.snake.position[0] + app.direction[0]][
+      app.snake.position[1] + app.direction[1]
+    ];
+
+  //if food
+  if (nextTile === "food") {
+    // -> create new snake head item
+    moveHeadTo(app.direction);
+
+    // -> generate new food
+    generateFood();
+  } else if (nextTile === "blank") {
+    moveHeadTo(app.direction);
+    removeTail(app.snake);
+    setTimeout(moveSnake, app.speed);
+  } else {
+    console.log("game over");
+  }
+  // -> game over
+  refreshSnake();
   renderTable();
 };
 
@@ -109,5 +169,4 @@ initializeGrid();
 initializeSnake();
 generateFood();
 renderTable();
-
 setTimeout(moveSnake, app.speed);
