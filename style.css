@@ -13,14 +13,10 @@ table {
   background-color: white;
 }
 
-.snake-head {
+.snake {
   background-color: black;
 }
 
-.snake-body {
-  background-color: grey;
-}
-
 .food {
-  background-color: blue;
+  background-color: grey;
 }

@@ -57,10 +57,24 @@ const initializeGrid = () => {
 const initializeSnake = () => {
   const snakeheadRow = Math.floor(HEIGHT / 2);
   const snakeheadCol = Math.ceil(WIDTH / 2);
-  app.grid[snakeheadRow][snakeheadCol] = "snake-head";
-  for (let i = 1; i < SNAKESTARTLEN; i++) {
-    app.grid[snakeheadRow][snakeheadCol - i] = "snake-body";
+  app.snake = createSnake(snakeheadRow, snakeheadCol, SNAKESTARTLEN);
+  placeSnakeOnGrid(app.snake);
+};
+
+const placeSnakeOnGrid = (snake) => {
+  console.log(snake);
+  app.grid[snake.position[0]][snake.position[1]] = "snake";
+  if (snake.next) {
+    placeSnakeOnGrid(snake.next);
   }
+};
+
+const createSnake = (startRow, startCol, length) => {
+  const snake = { position: [startRow, startCol], next: 0 };
+  if (length > 0) {
+    snake.next = createSnake(startRow, startCol - 1, length - 1);
+  }
+  return snake;
 };
 
 //returns an array of items [x-position, y-position] on an input grid
@@ -88,27 +102,6 @@ const generateFood = () => {
 };
 
 const moveSnake = () => {
-  const snakehead = findItems(app.grid, "snake-head")[0];
-  console.log(snakehead);
-  //determine direction of travel (take as right for now)
-  const nextTile = [snakehead[0], snakehead[1] + 1];
-
-  //determine next block -> blank/wall/food/snakebody
-  const nextTileValue = app.grid[nextTile[0]][nextTile[1]];
-
-  if (nextTileValue === "blank") {
-    //  move snakehead in direction of travel
-    app.grid[nextTile[0]][nextTile[1]] = "snake-head";
-    app.grid[snakehead[0]][snakehead[1]] = "snake-body";
-    //  find snaketail position
-    //  remove snaketail
-    app.grid[2][2] = "blank";
-  }
-  //if next block is blank:
-  //else if next block is food:
-  //  move snakehead in direction of travel
-  //  score += 1
-  //else: game over
   renderTable();
 };
 
