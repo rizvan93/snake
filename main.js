@@ -15,7 +15,7 @@ const addBoardBorders = (box, x, y) => {
   return box;
 };
 
-const createTable = () => {
+const initializeTable = () => {
   for (i = 0; i < HEIGHT; i++) {
     const row = document.createElement("tr");
     row.setAttribute("data-row", i);
@@ -28,4 +28,18 @@ const createTable = () => {
   }
 };
 
-createTable();
+const initialize = () => {
+  const grid = [];
+  for (i = 0; i < HEIGHT; i++) {
+    const row = [];
+    for (j = 0; j < WIDTH; j++) {
+      row.push(0);
+    }
+    grid.push(row);
+  }
+  app["grid"] = grid;
+  console.log(app.grid);
+};
+
+initialize();
+initializeTable();
