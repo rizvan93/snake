@@ -55,37 +55,78 @@ const initializeGrid = () => {
   app["grid"] = grid;
 };
 
-const initializeSnake = () => {
-  const snakeheadRow = Math.floor(HEIGHT / 2);
-  const snakeheadCol = Math.ceil(WIDTH / 2);
-  app.snake = createSnake(snakeheadRow, snakeheadCol, SNAKESTARTLEN);
-  placeSnakeOnGrid(app.snake);
-};
+const snake = {
+  initialize() {
+    const snakeheadRow = Math.floor(HEIGHT / 2);
+    const snakeheadCol = Math.ceil(WIDTH / 2);
+    app.snake = this.create(snakeheadRow, snakeheadCol, SNAKESTARTLEN);
+    this.placeOnGrid(app.snake);
+  },
+  placeOnGrid(snake) {
+    app.grid[snake.position[0]][snake.position[1]] = "snake";
+    if (snake.next) {
+      this.placeOnGrid(snake.next);
+    }
+  },
+  create(startRow, startCol, length) {
+    const snake = { position: [startRow, startCol], next: 0 };
+    if (length > 0) {
+      snake.next = this.create(startRow, startCol - 1, length - 1);
+    }
+    return snake;
+  },
+  moveHeadTo(direction) {
+    //create new snake head item
+    const newSnakehead = {
+      position: [
+        app.snake.position[0] + direction[0],
+        app.snake.position[1] + direction[1],
+      ],
+      next: app.snake,
+    };
+    //place new snake head on grid
+    app.grid[newSnakehead.position[0]][newSnakehead.position[1]] = "snake";
+    //link previous snake to new snake head
+    app.snake = newSnakehead;
+  },
+  removeTail(snake) {
+    if (snake.next.next) {
+      this.removeTail(snake.next);
+    } else {
+      //remove last snake body from grid
+      app.grid[snake.next.position[0]][snake.next.position[1]] = "blank";
+      //remove last link
+      snake.next = 0;
+    }
+  },
+  move() {
+    //determine direction of travel (assume right for now)
+    const direction = [0, 1];
 
-const refreshSnake = () => {
-  app.grid.forEach((row, i) => {
-    row.forEach((tile, j) => {
-      if (tile === "snake") {
-        app.grid[i][j] = "blank";
-      }
-    });
-  });
-  placeSnakeOnGrid(app.snake);
-};
+    //determine next tile
+    const nextTile =
+      app.grid[app.snake.position[0] + app.direction[0]][
+        app.snake.position[1] + app.direction[1]
+      ];
 
-const placeSnakeOnGrid = (snake) => {
-  app.grid[snake.position[0]][snake.position[1]] = "snake";
-  if (snake.next) {
-    placeSnakeOnGrid(snake.next);
-  }
-};
-
-const createSnake = (startRow, startCol, length) => {
-  const snake = { position: [startRow, startCol], next: 0 };
-  if (length > 0) {
-    snake.next = createSnake(startRow, startCol - 1, length - 1);
-  }
-  return snake;
+    //if food
+    if (nextTile === "food") {
+      // -> create new snake head item
+      snake.moveHeadTo(app.direction);
+      // -> generate new food
+      generateFood();
+      setTimeout(snake.move, app.speed);
+    } else if (nextTile === "blank") {
+      snake.moveHeadTo(app.direction);
+      snake.removeTail(app.snake);
+      setTimeout(snake.move, app.speed);
+    } else {
+      console.log("game over");
+    }
+    // -> game over
+    // refreshSnake();
+    renderTable();
+  },
 };
 
 //returns an array of items [x-position, y-position] on an input grid
@@ -115,58 +156,8 @@ const generateFood = () => {
   }
 };
 
-const removeTail = (snake) => {
-  if (snake.next.next) {
-    removeTail(snake.next);
-  } else {
-    snake.next = 0;
-  }
-};
-
-const moveHeadTo = (direction) => {
-  //create new snake head item
-  const newSnakehead = {
-    position: [
-      app.snake.position[0] + direction[0],
-      app.snake.position[1] + direction[1],
-    ],
-    next: app.snake,
-  };
-  //link previous snake to new snake head
-  app.snake = newSnakehead;
-};
-
-const moveSnake = () => {
-  //determine direction of travel (assume right for now)
-  const direction = [0, 1];
-
-  //determine next tile
-  const nextTile =
-    app.grid[app.snake.position[0] + app.direction[0]][
-      app.snake.position[1] + app.direction[1]
-    ];
-
-  //if food
-  if (nextTile === "food") {
-    // -> create new snake head item
-    moveHeadTo(app.direction);
-
-    // -> generate new food
-    generateFood();
-  } else if (nextTile === "blank") {
-    moveHeadTo(app.direction);
-    removeTail(app.snake);
-    setTimeout(moveSnake, app.speed);
-  } else {
-    console.log("game over");
-  }
-  // -> game over
-  refreshSnake();
-  renderTable();
-};
-
 initializeGrid();
-initializeSnake();
+snake.initialize();
 generateFood();
 renderTable();
-setTimeout(moveSnake, app.speed);
+setTimeout(snake.move, app.speed);
