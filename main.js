@@ -1,70 +1,80 @@
-const HEIGHT = 20;
-const WIDTH = 30;
+const HEIGHT = 30;
+const WIDTH = 50;
 const SNAKESTARTLEN = 4;
-const GRIDSIZE = 5;
+const GRIDSIZE = 10;
 const SCOREINTERVALFORSPEEDINCREMENT = 5;
 const SPEEDCOMPOUNDFACTOR = 1.2;
 const app = {
   speed: 300,
   direction: [0, 1],
   inputTaken: false,
+  screen: "welcome",
 };
 
 //cached elements
 const table = document.querySelector("table");
 const page = document.querySelector("body");
 const score = document.querySelector("#score");
+const start = document.querySelector("#start");
 
 //functions
-const addBoardBorders = (box, x, y) => {
-  x = parseInt(x);
-  if (x === 0) {
-    box.style.borderTopColor = "black";
-  } else if (x === HEIGHT - 1) {
-    box.style.borderBottomColor = "black";
-  }
-  y = parseInt(y);
-  if (y === 0) {
-    box.style.borderLeftColor = "black";
-  } else if (y === WIDTH - 1) {
-    box.style.borderRightColor = "black";
-  }
-  return box;
-};
 
-const renderPage = () => {
-  while (table.firstChild) {
-    table.removeChild(table.firstChild);
-  }
-  app.grid.forEach((modelRow, i) => {
-    const row = document.createElement("tr");
-    modelRow.forEach((value, j) => {
-      const box = document.createElement("td");
-      box.setAttribute("class", value);
-      box.style.height = `${GRIDSIZE}px`;
-      box.style.width = `${GRIDSIZE}px`;
-      row.append(addBoardBorders(box, i, j));
+const render = {
+  mainBox() {
+    document.querySelectorAll(".main-box").forEach((divBox) => {
+      divBox.style.display = "none";
     });
-    table.append(row);
-  });
-  if (app.score) {
-    score.innerText = app.score;
-  }
-};
-
-const initializeGrid = () => {
-  const grid = [];
-  for (let i = 0; i < HEIGHT; i++) {
-    const row = [];
-    for (let j = 0; j < WIDTH; j++) {
-      row.push("blank");
+    if (app.screen === "game") {
+      document.querySelector("#game-box").style.display = "block";
+      this.game();
+    } else if (app.screen === "welcome") {
+      document.querySelector("#welcome-box").style.display = "block";
+      this.welcome();
     }
-    grid.push(row);
-  }
-  app["grid"] = grid;
+  },
+  welcome() {
+    console.log("welcome");
+  },
+  game() {
+    while (table.firstChild) {
+      table.removeChild(table.firstChild);
+    }
+    app.grid.forEach((modelRow, i) => {
+      const row = document.createElement("tr");
+      modelRow.forEach((value, j) => {
+        const box = document.createElement("td");
+        box.setAttribute("class", value);
+        box.style.height = `${GRIDSIZE}px`;
+        box.style.width = `${GRIDSIZE}px`;
+        row.append(this.addBoardBorders(box, i, j));
+      });
+      table.append(row);
+    });
+    this.score();
+  },
+  score() {
+    const scoreLog = document.querySelector("#score");
+    if (!app.score) app.score = 0;
+    scoreLog.innerText = `Score: ${app.score}`;
+  },
+  addBoardBorders(box, x, y) {
+    x = parseInt(x);
+    if (x === 0) {
+      box.style.borderTopColor = "black";
+    } else if (x === HEIGHT - 1) {
+      box.style.borderBottomColor = "black";
+    }
+    y = parseInt(y);
+    if (y === 0) {
+      box.style.borderLeftColor = "black";
+    } else if (y === WIDTH - 1) {
+      box.style.borderRightColor = "black";
+    }
+    return box;
+  },
 };
 
-const snake = {
+const snakeMethods = {
   initialize() {
     const snakeheadRow = Math.floor(HEIGHT / 2);
     const snakeheadCol = Math.ceil(WIDTH / 2);
@@ -105,10 +115,9 @@ const snake = {
   },
   length(thisBody = app.snake) {
     if (thisBody.next) {
-      return 1 + snake.length(thisBody.next);
+      return 1 + snakeMethods.length(thisBody.next);
     } else return 1;
   },
-
   move() {
     const nextTile =
       app.grid[app.snake.position[0] + app.direction[0]][
@@ -116,111 +125,122 @@ const snake = {
       ];
 
     if (nextTile === "food") {
-      snake.moveHeadTo(app.direction);
-      if (!generateFood()) {
+      snakeMethods.moveHeadTo(app.direction);
+      if (!gridMethods.generateFood()) {
         console.log("win condition");
         return;
       }
-      updateScore();
-      updateSpeed();
+      gameMethods.updateScore();
+      gameMethods.updateSpeed();
     } else if (nextTile === "blank") {
-      snake.moveHeadTo(app.direction);
-      snake.removeTail();
+      snakeMethods.moveHeadTo(app.direction);
+      snakeMethods.removeTail();
     } else {
       console.log("game over");
       return;
     }
 
     app.inputTaken = false;
-    renderPage();
-    setTimeout(snake.move, app.speed);
+    render.game();
+    setTimeout(snakeMethods.move, app.speed);
+  },
+  changeDirection(keyDownEvent) {
+    if (!app.inputTaken) {
+      const newDirection = snakeMethods.keyToDir(keyDownEvent.code);
+      if (newDirection) {
+        if (snakeMethods.isValidChange(newDirection, app.direction)) {
+          app.direction = newDirection;
+          app.inputTaken = true;
+        }
+      }
+    }
+  },
+  isValidChange(dir1, dir2) {
+    if (Math.abs(dir1[0]) - Math.abs(dir2[0])) {
+      if (Math.abs(dir1[1]) - Math.abs(dir2[1])) {
+        return true;
+      }
+    }
+    return false;
+  },
+  keyToDir(code) {
+    switch (code) {
+      case "ArrowUp":
+        return [-1, 0];
+      case "ArrowRight":
+        return [0, 1];
+      case "ArrowDown":
+        return [1, 0];
+      case "ArrowLeft":
+        return [0, -1];
+      default:
+        return false;
+    }
   },
 };
 
-//returns an array of items [x-position, y-position] on an input grid
-const findItems = (grid, item) => {
-  return grid.reduce((accumulator, currentArray, row) => {
-    const indexesInRow = currentArray.reduce((accumulator, value, index) => {
-      if (value === item) accumulator.push(index);
+const gridMethods = {
+  initialize() {
+    const grid = [];
+    for (let i = 0; i < HEIGHT; i++) {
+      const row = [];
+      for (let j = 0; j < WIDTH; j++) {
+        row.push("blank");
+      }
+      grid.push(row);
+    }
+    app["grid"] = grid;
+  },
+  findItems(item) {
+    //returns an array of items [x-position, y-position] on the grid model
+    return app.grid.reduce((accumulator, currentArray, row) => {
+      const indexesInRow = currentArray.reduce((accumulator, value, index) => {
+        if (value === item) accumulator.push(index);
+        return accumulator;
+      }, []);
+      indexesInRow.forEach((index) => {
+        accumulator.push([row, index]);
+      });
       return accumulator;
     }, []);
-    indexesInRow.forEach((index) => {
-      accumulator.push([row, index]);
-    });
-    return accumulator;
-  }, []);
-};
+  },
+  generateFood() {
+    const blanks = gridMethods.findItems("blank");
+    if (blanks[0]) {
+      const newFoodIndex = Math.floor(Math.random() * blanks.length); //referenced from https://www.w3schools.com/js/js_random.asp
 
-const generateFood = () => {
-  const blanks = findItems(app.grid, "blank");
-  if (blanks[0]) {
-    const newFoodIndex = Math.floor(Math.random() * blanks.length); //referenced from https://www.w3schools.com/js/js_random.asp
-
-    const newFoodRow = blanks[newFoodIndex][0];
-    const newFoodCol = blanks[newFoodIndex][1];
-    app.grid[newFoodRow][newFoodCol] = "food";
-    return true;
-  } else {
-    return false;
-  }
-};
-
-const updateScore = () => {
-  app.score = snake.length() - SNAKESTARTLEN;
-};
-
-const updateSpeed = () => {
-  if (app.score % SCOREINTERVALFORSPEEDINCREMENT === 0) {
-    app.speed /= SPEEDCOMPOUNDFACTOR;
-  }
-};
-
-const changeDirection = (keyDownEvent) => {
-  if (!app.inputTaken) {
-    const newDirection = keyToDir(keyDownEvent.code);
-    if (newDirection) {
-      if (isValidChange(newDirection, app.direction)) {
-        app.direction = newDirection;
-        app.inputTaken = true;
-      }
-    }
-  }
-};
-
-const isValidChange = (dir1, dir2) => {
-  if (Math.abs(dir1[0]) - Math.abs(dir2[0])) {
-    if (Math.abs(dir1[1]) - Math.abs(dir2[1])) {
+      const newFoodRow = blanks[newFoodIndex][0];
+      const newFoodCol = blanks[newFoodIndex][1];
+      app.grid[newFoodRow][newFoodCol] = "food";
       return true;
-    }
-  }
-  return false;
-};
-
-const keyToDir = (code) => {
-  //retrieved switch case syntax from https://www.w3schools.com/js/js_switch.asp
-  switch (code) {
-    case "ArrowUp":
-      return [-1, 0];
-    case "ArrowRight":
-      return [0, 1];
-    case "ArrowDown":
-      return [1, 0];
-    case "ArrowLeft":
-      return [0, -1];
-    default:
+    } else {
       return false;
-  }
+    }
+  },
 };
 
-const initializeGame = () => {
-  initializeGrid();
-  snake.initialize();
-  generateFood();
-  renderPage();
+const gameMethods = {
+  updateScore() {
+    app.score = snakeMethods.length() - SNAKESTARTLEN;
+  },
+  updateSpeed() {
+    if (app.score % SCOREINTERVALFORSPEEDINCREMENT === 0) {
+      app.speed /= SPEEDCOMPOUNDFACTOR;
+    }
+  },
+  initialize(event) {
+    console.log("start");
+    app.screen = "game";
+    gridMethods.initialize();
+    snakeMethods.initialize();
+    gridMethods.generateFood();
+    render.mainBox();
+    setTimeout(snakeMethods.move, app.speed);
+  },
 };
 
 //event listeners
-page.addEventListener("keydown", changeDirection);
+page.addEventListener("keydown", snakeMethods.changeDirection);
+start.addEventListener("click", gameMethods.initialize);
 
-initializeGame();
-setTimeout(snake.move, app.speed);
+render.mainBox();
