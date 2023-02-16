@@ -1,15 +1,21 @@
-const HEIGHT = 15;
-const WIDTH = 20;
-const SNAKESTARTLEN = 3;
-const GRIDSIZE = 20;
+const HEIGHT = 20;
+const WIDTH = 30;
+const SNAKESTARTLEN = 4;
+const GRIDSIZE = 5;
+const SCOREINTERVALFORSPEEDINCREMENT = 5;
+const SPEEDCOMPOUNDFACTOR = 1.2;
 const app = {
-  speed: 1000,
+  speed: 300,
   direction: [0, 1],
+  inputTaken: false,
 };
 
 //cached elements
 const table = document.querySelector("table");
+const page = document.querySelector("body");
+const score = document.querySelector("#score");
 
+//functions
 const addBoardBorders = (box, x, y) => {
   x = parseInt(x);
   if (x === 0) {
@@ -26,7 +32,7 @@ const addBoardBorders = (box, x, y) => {
   return box;
 };
 
-const renderTable = () => {
+const renderPage = () => {
   while (table.firstChild) {
     table.removeChild(table.firstChild);
   }
@@ -41,6 +47,9 @@ const renderTable = () => {
     });
     table.append(row);
   });
+  if (app.score) {
+    score.innerText = app.score;
+  }
 };
 
 const initializeGrid = () => {
@@ -60,9 +69,9 @@ const snake = {
     const snakeheadRow = Math.floor(HEIGHT / 2);
     const snakeheadCol = Math.ceil(WIDTH / 2);
     app.snake = this.create(snakeheadRow, snakeheadCol, SNAKESTARTLEN);
-    this.placeOnGrid(app.snake);
+    this.placeOnGrid();
   },
-  placeOnGrid(snake) {
+  placeOnGrid(snake = app.snake) {
     app.grid[snake.position[0]][snake.position[1]] = "snake";
     if (snake.next) {
       this.placeOnGrid(snake.next);
@@ -70,13 +79,12 @@ const snake = {
   },
   create(startRow, startCol, length) {
     const snake = { position: [startRow, startCol], next: 0 };
-    if (length > 0) {
+    if (length > 1) {
       snake.next = this.create(startRow, startCol - 1, length - 1);
     }
     return snake;
   },
   moveHeadTo(direction) {
-    //create new snake head item
     const newSnakehead = {
       position: [
         app.snake.position[0] + direction[0],
@@ -84,48 +92,48 @@ const snake = {
       ],
       next: app.snake,
     };
-    //place new snake head on grid
     app.grid[newSnakehead.position[0]][newSnakehead.position[1]] = "snake";
-    //link previous snake to new snake head
     app.snake = newSnakehead;
   },
-  removeTail(snake) {
+  removeTail(snake = app.snake) {
     if (snake.next.next) {
       this.removeTail(snake.next);
     } else {
-      //remove last snake body from grid
       app.grid[snake.next.position[0]][snake.next.position[1]] = "blank";
-      //remove last link
       snake.next = 0;
     }
   },
-  move() {
-    //determine direction of travel (assume right for now)
-    const direction = [0, 1];
+  length(thisBody = app.snake) {
+    if (thisBody.next) {
+      return 1 + snake.length(thisBody.next);
+    } else return 1;
+  },
 
-    //determine next tile
+  move() {
     const nextTile =
       app.grid[app.snake.position[0] + app.direction[0]][
         app.snake.position[1] + app.direction[1]
       ];
 
-    //if food
     if (nextTile === "food") {
-      // -> create new snake head item
       snake.moveHeadTo(app.direction);
-      // -> generate new food
-      generateFood();
-      setTimeout(snake.move, app.speed);
+      if (!generateFood()) {
+        console.log("win condition");
+        return;
+      }
+      updateScore();
+      updateSpeed();
     } else if (nextTile === "blank") {
       snake.moveHeadTo(app.direction);
-      snake.removeTail(app.snake);
-      setTimeout(snake.move, app.speed);
+      snake.removeTail();
     } else {
       console.log("game over");
+      return;
     }
-    // -> game over
-    // refreshSnake();
-    renderTable();
+
+    app.inputTaken = false;
+    renderPage();
+    setTimeout(snake.move, app.speed);
   },
 };
 
@@ -151,13 +159,68 @@ const generateFood = () => {
     const newFoodRow = blanks[newFoodIndex][0];
     const newFoodCol = blanks[newFoodIndex][1];
     app.grid[newFoodRow][newFoodCol] = "food";
+    return true;
   } else {
-    console.log("win condition");
+    return false;
   }
 };
 
-initializeGrid();
-snake.initialize();
-generateFood();
-renderTable();
+const updateScore = () => {
+  app.score = snake.length() - SNAKESTARTLEN;
+};
+
+const updateSpeed = () => {
+  if (app.score % SCOREINTERVALFORSPEEDINCREMENT === 0) {
+    app.speed /= SPEEDCOMPOUNDFACTOR;
+  }
+};
+
+const changeDirection = (keyDownEvent) => {
+  if (!app.inputTaken) {
+    const newDirection = keyToDir(keyDownEvent.code);
+    if (newDirection) {
+      if (isValidChange(newDirection, app.direction)) {
+        app.direction = newDirection;
+        app.inputTaken = true;
+      }
+    }
+  }
+};
+
+const isValidChange = (dir1, dir2) => {
+  if (Math.abs(dir1[0]) - Math.abs(dir2[0])) {
+    if (Math.abs(dir1[1]) - Math.abs(dir2[1])) {
+      return true;
+    }
+  }
+  return false;
+};
+
+const keyToDir = (code) => {
+  //retrieved switch case syntax from https://www.w3schools.com/js/js_switch.asp
+  switch (code) {
+    case "ArrowUp":
+      return [-1, 0];
+    case "ArrowRight":
+      return [0, 1];
+    case "ArrowDown":
+      return [1, 0];
+    case "ArrowLeft":
+      return [0, -1];
+    default:
+      return false;
+  }
+};
+
+const initializeGame = () => {
+  initializeGrid();
+  snake.initialize();
+  generateFood();
+  renderPage();
+};
+
+//event listeners
+page.addEventListener("keydown", changeDirection);
+
+initializeGame();
 setTimeout(snake.move, app.speed);
