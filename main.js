@@ -9,6 +9,11 @@ const app = {
   direction: [0, 1],
   inputTaken: false,
   screen: "welcome",
+  leaderboard: [
+    { name: "Rizvan", score: 10 },
+    { name: "Faizal", score: 100 },
+    { name: "Ida", score: 50 },
+  ],
 };
 
 //cached elements
@@ -20,6 +25,10 @@ const start = document.querySelector("#start");
 //functions
 
 const render = {
+  all() {
+    this.mainBox();
+    this.leaderboard();
+  },
   mainBox() {
     document.querySelectorAll(".main-box").forEach((divBox) => {
       divBox.style.display = "none";
@@ -28,8 +37,26 @@ const render = {
       document.querySelector("#game-box").style.display = "block";
       this.game();
     } else if (app.screen === "welcome") {
-      document.querySelector("#welcome-box").style.display = "block";
+      document.querySelector("#welcome-box").style.display = "flex";
       this.welcome();
+    }
+  },
+  leaderboard() {
+    if (app.leaderboard.length > 0) {
+      document.querySelector("#leaderboard").innerText = "LEADERBOARD";
+      const scoreboard = document.querySelector("#score-box");
+      app.leaderboard.forEach((entry, i) => {
+        if (i <= 10) {
+          const scoreSN = document.createElement("p");
+          (scoreSN.innerText = i + 1), ".";
+          scoreboard.append(scoreSN);
+          const name = document.createElement("p");
+          name.innerText = entry.name;
+          scoreboard.append(name);
+          const score = document.createElement("p");
+          score = entry.score;
+        }
+      });
     }
   },
   welcome() {
@@ -220,6 +247,18 @@ const gridMethods = {
 };
 
 const gameMethods = {
+  trimLeaderboard() {
+    app.leaderboard.sort((a, b) => b.score - a.score);
+    app.leaderboard = app.leaderboard.map((entry, i) => {
+      if (i < 10) return entry;
+    });
+    console.log(app.leaderboard);
+  },
+  endGame() {
+    const entry = { name: app.playerName, score: app.score };
+    app.leaderboard.push(entry);
+    this.trimLeaderboard();
+  },
   updateScore() {
     app.score = snakeMethods.length() - SNAKESTARTLEN;
   },
@@ -229,12 +268,13 @@ const gameMethods = {
     }
   },
   initialize(event) {
-    console.log("start");
+    event.preventDefault();
     app.screen = "game";
+    app.playerName = document.querySelector("player-name") || "Player 1";
     gridMethods.initialize();
     snakeMethods.initialize();
     gridMethods.generateFood();
-    render.mainBox();
+    render.all();
     setTimeout(snakeMethods.move, app.speed);
   },
 };
@@ -243,4 +283,5 @@ const gameMethods = {
 page.addEventListener("keydown", snakeMethods.changeDirection);
 start.addEventListener("click", gameMethods.initialize);
 
-render.mainBox();
+gameMethods.trimLeaderboard();
+render.all();
