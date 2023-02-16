@@ -29,6 +29,11 @@ body {
   align-items: center;
 }
 
+#leaderboard {
+  display: grid;
+  grid: repeat(10, 1fr) / 1fr 5fr 1fr;
+}
+
 table {
   border: 0;
   border-style: solid;

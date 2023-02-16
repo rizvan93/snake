@@ -21,6 +21,7 @@ const table = document.querySelector("table");
 const page = document.querySelector("body");
 const score = document.querySelector("#score");
 const start = document.querySelector("#start");
+const leaderboard = document.querySelector("#leaderboard");
 
 //functions
 
@@ -43,18 +44,21 @@ const render = {
   },
   leaderboard() {
     if (app.leaderboard.length > 0) {
-      document.querySelector("#leaderboard").innerText = "LEADERBOARD";
-      const scoreboard = document.querySelector("#score-box");
+      document.querySelector("#leaderboard-title").innerText = "LEADERBOARD";
+      while (leaderboard.firstChild) {
+        leaderboard.firstChild.remove();
+      }
       app.leaderboard.forEach((entry, i) => {
         if (i <= 10) {
           const scoreSN = document.createElement("p");
-          (scoreSN.innerText = i + 1), ".";
-          scoreboard.append(scoreSN);
+          scoreSN.innerText = `${i + 1}.`;
+          leaderboard.append(scoreSN);
           const name = document.createElement("p");
           name.innerText = entry.name;
-          scoreboard.append(name);
+          leaderboard.append(name);
           const score = document.createElement("p");
-          score = entry.score;
+          score.innerText = entry.score;
+          leaderboard.append(score);
         }
       });
     }
