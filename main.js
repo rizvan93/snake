@@ -167,8 +167,7 @@ const snakeMethods = {
       snakeMethods.moveHeadTo(app.direction);
       snakeMethods.removeTail();
     } else {
-      console.log("game over");
-      return;
+      return gameMethods.endGame();
     }
 
     app.inputTaken = false;
@@ -176,12 +175,15 @@ const snakeMethods = {
     setTimeout(snakeMethods.move, app.speed);
   },
   changeDirection(keyDownEvent) {
-    if (!app.inputTaken) {
-      const newDirection = snakeMethods.keyToDir(keyDownEvent.code);
-      if (newDirection) {
-        if (snakeMethods.isValidChange(newDirection, app.direction)) {
-          app.direction = newDirection;
-          app.inputTaken = true;
+    if (app.screen === "game") {
+      keyDownEvent.preventDefault();
+      if (!app.inputTaken) {
+        const newDirection = snakeMethods.keyToDir(keyDownEvent.code);
+        if (newDirection) {
+          if (snakeMethods.isValidChange(newDirection, app.direction)) {
+            app.direction = newDirection;
+            app.inputTaken = true;
+          }
         }
       }
     }
@@ -262,6 +264,7 @@ const gameMethods = {
     const entry = { name: app.playerName, score: app.score };
     app.leaderboard.push(entry);
     this.trimLeaderboard();
+    render.leaderboard();
   },
   updateScore() {
     app.score = snakeMethods.length() - SNAKESTARTLEN;
