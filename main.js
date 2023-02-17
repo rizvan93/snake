@@ -149,11 +149,13 @@ const snakeMethods = {
       return 1 + snakeMethods.length(thisBody.next);
     } else return 1;
   },
+  nextTile() {
+    return app.grid[app.snake.position[0] + app.direction[0]][
+      app.snake.position[1] + app.direction[1]
+    ];
+  },
   move() {
-    const nextTile =
-      app.grid[app.snake.position[0] + app.direction[0]][
-        app.snake.position[1] + app.direction[1]
-      ];
+    const nextTile = this.nextTile();
 
     if (nextTile === "food") {
       snakeMethods.moveHeadTo(app.direction);
