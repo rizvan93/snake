@@ -10,10 +10,21 @@ const app = {
   speed: 150,
   direction: [0, 1],
   inputTaken: false,
-  screen: "game",
+  screen: "welcome",
+  playerName: "",
   leaderboard: [
     { name: "Rizvan", score: 10 },
     { name: "Faizal", score: 100 },
+    { name: "Ida", score: 50 },
+    { name: "Ida", score: 50 },
+    { name: "Ida", score: 50 },
+    { name: "Ida", score: 50 },
+    { name: "Ida", score: 50 },
+    { name: "Ida", score: 50 },
+    { name: "Ida", score: 50 },
+    { name: "Ida", score: 50 },
+    { name: "Ida", score: 50 },
+    { name: "Ida", score: 50 },
     { name: "Ida", score: 50 },
   ],
 };
@@ -24,6 +35,8 @@ const page = document.querySelector("body");
 const score = document.querySelector("#score");
 const start = document.querySelector("#start");
 const leaderboard = document.querySelector("#leaderboard");
+const restart = document.querySelector("#restart");
+const returnHome = document.querySelector("#return-home");
 
 //functions
 
@@ -36,12 +49,16 @@ const render = {
     document.querySelectorAll(".main-box").forEach((divBox) => {
       divBox.style.display = "none";
     });
+    if (LOG) console.log("model screen: ", app.screen);
     if (app.screen === "game") {
       document.querySelector("#game-box").style.display = "block";
       this.game();
     } else if (app.screen === "welcome") {
       document.querySelector("#welcome-box").style.display = "flex";
       this.welcome();
+    } else if (app.screen === "game-over") {
+      document.querySelector("#game-box").style.display = "block";
+      document.querySelector("#game-over").style.display = "grid";
     }
   },
   leaderboard() {
@@ -51,7 +68,7 @@ const render = {
         leaderboard.firstChild.remove();
       }
       app.leaderboard.forEach((entry, i) => {
-        if (i <= 10) {
+        if (i < 10) {
           const scoreSN = document.createElement("p");
           scoreSN.innerText = `${i + 1}.`;
           leaderboard.append(scoreSN);
@@ -66,6 +83,7 @@ const render = {
     }
   },
   welcome() {
+    document.querySelector("#player-name").value = "";
     if (LOG) console.log("welcome");
   },
   game() {
@@ -169,6 +187,7 @@ const snakeMethods = {
     if (nextTile === "food") {
       snakeMethods.moveHeadTo(app.direction);
       if (!gridMethods.generateFood()) {
+        gameMethods.endGame();
         if (LOG) console.log("win condition");
         return;
       }
@@ -278,6 +297,10 @@ const gameMethods = {
       this.trimLeaderboard();
       render.leaderboard();
     }
+    app.screen = "game-over";
+    render.all();
+    restart.addEventListener("click", gameMethods.initialize);
+    returnHome.addEventListener("click", gameMethods.returnHome);
     if (LOG) console.log("game over");
   },
   updateScore() {
@@ -304,12 +327,18 @@ const gameMethods = {
     render.all();
     setTimeout(snakeMethods.move, app.speed);
   },
+  returnHome(event) {
+    if (event) event.preventDefault();
+    app.screen = "welcome";
+    app.playerName = "";
+    render.all();
+  },
 };
 
 //event listeners
 page.addEventListener("keydown", snakeMethods.changeDirection);
 start.addEventListener("click", gameMethods.initialize);
 
-if (app.screen === "game") gameMethods.initialize();
+if (app.screen !== "welcome") gameMethods.initialize();
 gameMethods.trimLeaderboard();
 render.all();
