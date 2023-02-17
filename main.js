@@ -2,14 +2,15 @@ const HEIGHT = 30;
 const WIDTH = 50;
 const SNAKESTARTLEN = 4;
 const GRIDSIZE = 10;
-const SCOREINTERVALFORSPEEDINCREMENT = 5;
-const SPEEDCOMPOUNDFACTOR = 1.2;
+const SCOREINTERVALFORSPEEDINCREMENT = 10;
+const SPEEDDECREMENT = 5;
+const SPEEDCOMPOUNDFACTOR = 1.05;
 const LOG = true;
 const app = {
-  speed: 300,
+  speed: 150,
   direction: [0, 1],
   inputTaken: false,
-  screen: "welcome",
+  screen: "game",
   leaderboard: [
     { name: "Rizvan", score: 10 },
     { name: "Faizal", score: 100 },
@@ -268,26 +269,35 @@ const gameMethods = {
     app.leaderboard = app.leaderboard.map((entry, i) => {
       if (i < 10) return entry;
     });
-    if (LOG) console.log(`leaderboard: ${app.leaderboard}`);
+    if (LOG) console.log(`update leaderboard: ${app.leaderboard}`);
   },
   endGame() {
-    const entry = { name: app.playerName, score: app.score };
-    app.leaderboard.push(entry);
-    this.trimLeaderboard();
-    render.leaderboard();
+    if (app.score > 0) {
+      const entry = { name: app.playerName, score: app.score };
+      app.leaderboard.push(entry);
+      this.trimLeaderboard();
+      render.leaderboard();
+    }
+    if (LOG) console.log("game over");
   },
   updateScore() {
     app.score = snakeMethods.length() - SNAKESTARTLEN;
   },
   updateSpeed() {
     if (app.score % SCOREINTERVALFORSPEEDINCREMENT === 0) {
-      app.speed /= SPEEDCOMPOUNDFACTOR;
+      if (app.score > SPEEDDECREMENT + 1) {
+        app.speed -= SPEEDDECREMENT;
+      } else {
+        app.speed /= SPEEDCOMPOUNDFACTOR;
+      }
+      if (LOG) console.log("New speed: ", app.speed);
     }
   },
   initialize(event) {
     if (event) event.preventDefault();
     app.screen = "game";
-    app.playerName = document.querySelector("player-name") || "Player 1";
+    app.playerName = document.querySelector("#player-name").value || "Player 1";
+    if (LOG) console.log(app.playerName);
     gridMethods.initialize();
     snakeMethods.initialize();
     gridMethods.generateFood();
@@ -300,7 +310,6 @@ const gameMethods = {
 page.addEventListener("keydown", snakeMethods.changeDirection);
 start.addEventListener("click", gameMethods.initialize);
 
-if ((app.screen = "game")) gameMethods.initialize();
-
+if (app.screen === "game") gameMethods.initialize();
 gameMethods.trimLeaderboard();
 render.all();
