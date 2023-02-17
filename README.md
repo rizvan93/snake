@@ -20,7 +20,7 @@ I chose this game to demonstrate my understanding of the various features of HTM
 
 ## Timeframe
 
-1 week (5 working days)
+3 working days
 
 ## Game Rules
 
@@ -28,7 +28,8 @@ I built the rules of my memory of how this game works. The player has to control
 
 ## Wireframe & User Stories
 
-![Wireframe of Welcome Screen] ()  
+![Wireframe of Welcome Screen] ()
+
 ![Wireframe of Snake Game]()
 
 | **When a user...**              | **...this should happen**                               |
@@ -54,7 +55,12 @@ I built the rules of my memory of how this game works. The player has to control
 
 ## Development Approach and Details
 
-The game is designed and implemented using a model-view-controller architectural approach as described below: 
+The game is designed and implemented using a model-view-controller architectural approach as described below. My approach to developing this game was to:
+1. Generate a grid, snake, and food model and render it into the view (1/2 day)
+2. Add motion and user control for the snake (1/2 day)
+3. Add game logic (1 day)
+4. Add score, welcome screen, and leaderboard (1/2 day)
+5. Style and add sound (1/2 day)
 
 #### _Model_
 
@@ -246,9 +252,15 @@ const snakeMethods = {
 
 The controller also includes several other functions, such as to check the validity of a directional change, generate food, speed up the snake, but these are excluded from this README for brevity. 
 
-
 ## Future Developments & Improvements
+
+Potential improvements for the future include: 
+1. Allow an infinite board where the snake enters from the opposite side when hitting a wall (e.g. enter from the top when hitting the bottom)
+2. Include animations for the snake movement
+3. Download and upload the leaderboard score to a server
 
 ## Summary
 
-## References & Asset Attributions
+This was my first attempt at creating a software product within a tight timeline. Nonetheless, by consientiously applying the skills and knowledge I learnt in the first two weeks of General Assembly's Software Engineering Immersive, I was able to implement a workable game of snake which I must admit is rather fun to play. 
+
+## Asset Attributions
