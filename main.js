@@ -4,6 +4,7 @@ const SNAKESTARTLEN = 4;
 const GRIDSIZE = 10;
 const SCOREINTERVALFORSPEEDINCREMENT = 5;
 const SPEEDCOMPOUNDFACTOR = 1.2;
+const LOG = true;
 const app = {
   speed: 300,
   direction: [0, 1],
@@ -64,7 +65,7 @@ const render = {
     }
   },
   welcome() {
-    console.log("welcome");
+    if (LOG) console.log("welcome");
   },
   game() {
     while (table.firstChild) {
@@ -150,17 +151,24 @@ const snakeMethods = {
     } else return 1;
   },
   nextTile() {
-    return app.grid[app.snake.position[0] + app.direction[0]][
-      app.snake.position[1] + app.direction[1]
-    ];
+    const nextRow = app.snake.position[0] + app.direction[0];
+    const nextCol = app.snake.position[1] + app.direction[1];
+
+    if (LOG) console.log(`Next tile: ${nextRow}, ${nextCol}`);
+
+    if (nextRow < 0 || nextRow >= HEIGHT || nextCol < 0 || nextCol >= WIDTH) {
+      if (LOG) console.log("wall hit");
+      return false;
+    }
+    return app.grid[nextRow][nextCol];
   },
   move() {
-    const nextTile = this.nextTile();
+    const nextTile = snakeMethods.nextTile();
 
     if (nextTile === "food") {
       snakeMethods.moveHeadTo(app.direction);
       if (!gridMethods.generateFood()) {
-        console.log("win condition");
+        if (LOG) console.log("win condition");
         return;
       }
       gameMethods.updateScore();
@@ -260,7 +268,7 @@ const gameMethods = {
     app.leaderboard = app.leaderboard.map((entry, i) => {
       if (i < 10) return entry;
     });
-    console.log(app.leaderboard);
+    if (LOG) console.log(`leaderboard: ${app.leaderboard}`);
   },
   endGame() {
     const entry = { name: app.playerName, score: app.score };
@@ -277,7 +285,7 @@ const gameMethods = {
     }
   },
   initialize(event) {
-    event.preventDefault();
+    if (event) event.preventDefault();
     app.screen = "game";
     app.playerName = document.querySelector("player-name") || "Player 1";
     gridMethods.initialize();
@@ -291,6 +299,8 @@ const gameMethods = {
 //event listeners
 page.addEventListener("keydown", snakeMethods.changeDirection);
 start.addEventListener("click", gameMethods.initialize);
+
+if ((app.screen = "game")) gameMethods.initialize();
 
 gameMethods.trimLeaderboard();
 render.all();
