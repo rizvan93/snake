@@ -1,11 +1,11 @@
-const HEIGHT = 30;
-const WIDTH = 50;
+const HEIGHT = 40;
+const WIDTH = 40;
 const SNAKESTARTLEN = 4;
 const GRIDSIZE = 10;
 const SCOREINTERVALFORSPEEDINCREMENT = 10;
 const SPEEDDECREMENT = 5;
 const SPEEDCOMPOUNDFACTOR = 1.05;
-const LOG = true;
+const LOG = false;
 const app = {
   speed: 150,
   direction: [0, 1],
@@ -15,16 +15,6 @@ const app = {
   leaderboard: [
     { name: "Rizvan", score: 10 },
     { name: "Faizal", score: 100 },
-    { name: "Ida", score: 50 },
-    { name: "Ida", score: 50 },
-    { name: "Ida", score: 50 },
-    { name: "Ida", score: 50 },
-    { name: "Ida", score: 50 },
-    { name: "Ida", score: 50 },
-    { name: "Ida", score: 50 },
-    { name: "Ida", score: 50 },
-    { name: "Ida", score: 50 },
-    { name: "Ida", score: 50 },
     { name: "Ida", score: 50 },
   ],
 };
@@ -320,6 +310,7 @@ const gameMethods = {
     if (event) event.preventDefault();
     app.screen = "game";
     app.playerName = document.querySelector("#player-name").value || "Player 1";
+    app.direction = [0, 1];
     if (LOG) console.log(app.playerName);
     gridMethods.initialize();
     snakeMethods.initialize();
