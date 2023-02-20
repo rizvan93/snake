@@ -1,11 +1,11 @@
 const HEIGHT = 20;
 const WIDTH = 30;
-const SNAKESTARTLEN = 4;
+const SNAKE_START_LEN = 4;
 const GRIDSIZE = 10;
-const SCOREINTERVALFORSPEEDINCREMENT = 5;
-const SPEEDDECREMENT = 15;
-const SPEEDCOMPOUNDFACTOR = 1.05;
-const LOG = true;
+const SCORE_INTERVAL_FOR_SPEED_INCREASE = 5;
+const SPEED_DECREMENT = 15;
+const SPEED_COMPOUND_FACTOR = 1.05;
+const LOG = false;
 const app = {
   speed: 150,
   direction: [0, 1],
@@ -119,7 +119,7 @@ const snakeMethods = {
   initialize() {
     const snakeheadRow = Math.floor(HEIGHT / 2);
     const snakeheadCol = Math.ceil(WIDTH / 2);
-    app.snake = this.create(snakeheadRow, snakeheadCol, SNAKESTARTLEN);
+    app.snake = this.create(snakeheadRow, snakeheadCol, SNAKE_START_LEN);
     this.placeOnGrid();
   },
   placeOnGrid(snake = app.snake) {
@@ -317,16 +317,16 @@ const gameMethods = {
     if (LOG) console.log("game over");
   },
   updateScore() {
-    app.score = snakeMethods.length() - SNAKESTARTLEN;
+    app.score = snakeMethods.length() - SNAKE_START_LEN;
   },
   updateSpeed() {
     if (LOG) console.log("speed update function");
-    if (app.score % SCOREINTERVALFORSPEEDINCREMENT === 0) {
+    if (app.score % SCORE_INTERVAL_FOR_SPEED_INCREASE === 0) {
       if (LOG) console.log("current speed: ", app.speed);
-      if (app.speed > SPEEDDECREMENT + 1) {
-        app.speed -= SPEEDDECREMENT;
+      if (app.speed > SPEED_DECREMENT + 1) {
+        app.speed -= SPEED_DECREMENT;
       } else {
-        app.speed /= SPEEDCOMPOUNDFACTOR;
+        app.speed /= SPEED_COMPOUND_FACTOR;
       }
       if (LOG) console.log("New speed: ", app.speed);
     }

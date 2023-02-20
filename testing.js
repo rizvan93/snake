@@ -94,13 +94,15 @@ describe("initialize game comprising grid, snake, and food", () => {
     }
   });
 
-  it("snakeMethods.initialize creates snake of length 4 and places on grid correctly, starting at position 20, 20", () => {
+  it("snakeMethods.initialize creates snake of length 4 and places on grid correctly, starting at midpoint of grid", () => {
     gridMethods.initialize();
 
     snakeMethods.initialize();
 
     for (let i = 0; i < 4; i++) {
-      chai.expect(app.grid[20][20 - i]).to.equal("snake");
+      chai
+        .expect(app.grid[Math.floor(HEIGHT / 2)][Math.floor(WIDTH) / 2 - i])
+        .to.equal("snake");
     }
   });
 
@@ -110,7 +112,9 @@ describe("initialize game comprising grid, snake, and food", () => {
 
     const blankPositions = gridMethods.findItems("blank");
 
-    chai.expect(blankPositions.length).to.equal(1596);
+    chai
+      .expect(blankPositions.length)
+      .to.equal(HEIGHT * WIDTH - SNAKE_START_LEN);
   });
 
   it("gridMethods.findItems('blank) contains only and all locations of blanks on grid", () => {
@@ -148,133 +152,279 @@ describe("initialize game comprising grid, snake, and food", () => {
 });
 
 describe("Move Snake", () => {
-  gridMethods.initialize();
-  snakeMethods.initialize();
-  app.direction = [0, 1];
+  it("snakeMethods.updateDirection correctly changes to the next direction when inputQueue.length = 1", () => {
+    for (direction of directions) {
+      for (nextDirection of directions) {
+      }
+    }
+
+    snakeMethods.updateDirection();
+  });
+
+  it(
+    "snakeMethods.updateDirection correctly changes to the next direction when inputQueue.length = 2"
+  );
+
+  it(
+    "snakeMethods.updateDirection correctly removes the first item from inputQueue after changing direction"
+  );
 
   it("snakeMethods.nextTile correctly identifies next tile as food while moving right", () => {
-    app.grid[20][21] = "food";
-    chai.expect(snakeMethods.nextTile()).to.equal("food");
+    gridMethods.initialize();
+    app.direction = [0, 1];
+    app.grid.forEach((row, rowIndex) => {
+      row.forEach((tile, colIndex) => {
+        gridMethods.initialize();
+        if (colIndex <= WIDTH - 2) {
+          app.snake = {
+            position: [rowIndex, colIndex],
+            next: 0,
+          };
+          snakeMethods.placeOnGrid();
+          app.grid[rowIndex][colIndex + 1] = "food";
+
+          chai.expect(snakeMethods.nextTile()).to.equal("food");
+        }
+      });
+    });
   });
 
   it("snakeMethods.nextTile correctly identifies next tile as a snake while moving right", () => {
-    app.grid[20][21] = "snake";
-    chai.expect(snakeMethods.nextTile()).to.equal("snake");
+    gridMethods.initialize();
+    app.direction = [0, 1];
+    app.grid.forEach((row, rowIndex) => {
+      row.forEach((tile, colIndex) => {
+        gridMethods.initialize();
+        if (colIndex <= WIDTH - 2) {
+          app.snake = {
+            position: [rowIndex, colIndex],
+            next: 0,
+          };
+          snakeMethods.placeOnGrid();
+          app.grid[rowIndex][colIndex + 1] = "snake";
+
+          chai.expect(snakeMethods.nextTile()).to.equal("snake");
+        }
+      });
+    });
   });
 
   it("snakeMethods.nextTile correctly identifies next tile as a blank while moving right", () => {
-    app.grid[20][21] = "blank";
-    chai.expect(snakeMethods.nextTile()).to.equal("blank");
+    gridMethods.initialize();
+    app.direction = [0, 1];
+    app.grid.forEach((row, rowIndex) => {
+      row.forEach((tile, colIndex) => {
+        gridMethods.initialize();
+        if (colIndex <= WIDTH - 2) {
+          app.snake = {
+            position: [rowIndex, colIndex],
+            next: 0,
+          };
+          snakeMethods.placeOnGrid();
+          app.grid[rowIndex][colIndex + 1] = "blank";
+
+          chai.expect(snakeMethods.nextTile()).to.equal("blank");
+        }
+      });
+    });
   });
 
   it("snakeMethods.nextTile correctly identifies next tile as a wall while moving right", () => {
-    gridMethods.initialize();
-    app.snake = snakeMethods.create(20, WIDTH - 1, 4);
-    snakeMethods.placeOnGrid(app.snake);
+    app.grid.forEach((row, rowIndex) => {
+      gridMethods.initialize();
+      app.direction = [0, 1];
+      app.snake = snakeMethods.create(rowIndex, WIDTH - 1, 4);
+      snakeMethods.placeOnGrid(app.snake);
 
-    chai.expect(snakeMethods.nextTile()).to.equal(false);
+      chai.expect(snakeMethods.nextTile()).to.equal(false);
+    });
   });
 
   it("snakeMethods.nextTile correctly identifies next tile while moving up", () => {
     gridMethods.initialize();
-    snakeMethods.initialize();
     app.direction = [-1, 0];
-    app.grid[19][20] = "food";
+    app.grid.forEach((row, rowIndex) => {
+      row.forEach((tile, colIndex) => {
+        gridMethods.initialize();
+        if (rowIndex >= 1) {
+          const nextValue = randomValue();
+          app.snake = {
+            position: [rowIndex, colIndex],
+            next: 0,
+          };
+          snakeMethods.placeOnGrid();
+          app.grid[rowIndex - 1][colIndex] = nextValue;
 
-    chai.expect(snakeMethods.nextTile()).to.equal("food");
+          chai.expect(snakeMethods.nextTile()).to.equal(nextValue);
+        }
+      });
+    });
   });
 
   it("snakeMethods.nextTile correctly identifies next tile while moving down", () => {
     gridMethods.initialize();
-    snakeMethods.initialize();
     app.direction = [1, 0];
-    app.grid[21][20] = "food";
+    app.grid.forEach((row, rowIndex) => {
+      row.forEach((tile, colIndex) => {
+        gridMethods.initialize();
+        if (rowIndex <= HEIGHT - 2) {
+          const nextValue = randomValue();
+          app.snake = {
+            position: [rowIndex, colIndex],
+            next: 0,
+          };
+          snakeMethods.placeOnGrid();
+          app.grid[rowIndex + 1][colIndex] = nextValue;
 
-    chai.expect(snakeMethods.nextTile()).to.equal("food");
+          console.log(app.grid);
+
+          chai.expect(snakeMethods.nextTile()).to.equal(nextValue);
+        }
+      });
+    });
   });
 
   it("snakeMethods.nextTile correctly identifies next tile while moving left", () => {
     gridMethods.initialize();
-    app.snake = {
-      position: [20, 20],
-      next: {
-        position: [20, 21],
-        next: {
-          position: [20, 22],
-          next: {
-            position: [20, 23],
-            next: 0,
-          },
-        },
-      },
-    };
-    snakeMethods.placeOnGrid(app.snake);
     app.direction = [0, -1];
-    app.grid[20][19] = "food";
+    app.grid.forEach((row, rowIndex) => {
+      row.forEach((tile, colIndex) => {
+        gridMethods.initialize();
+        if (colIndex >= 1) {
+          const nextValue = randomValue();
+          app.snake = {
+            position: [rowIndex, colIndex],
+            next: 0,
+          };
+          snakeMethods.placeOnGrid();
+          app.grid[rowIndex][colIndex - 1] = nextValue;
 
-    chai.expect(snakeMethods.nextTile()).to.equal("food");
+          chai.expect(snakeMethods.nextTile()).to.equal(nextValue);
+        }
+      });
+    });
   });
 
   it("moveHeadTo correctly moves head one tile to the right", () => {
-    gridMethods.initialize();
-    snakeMethods.initialize();
+    app.grid.forEach((row, rowIndex) => {
+      row.forEach((tile, colIndex) => {
+        gridMethods.initialize();
 
-    snakeMethods.moveHeadTo([0, 1]);
+        if (colIndex <= WIDTH - 2) {
+          app.snake = {
+            position: [rowIndex, colIndex],
+            next: 0,
+          };
 
-    chai.expect(app.snake.position).to.deep.equal([20, 21]);
-    chai.expect(app.grid[20][21]).to.equal("snake");
+          snakeMethods.moveHeadTo([0, 1]);
+
+          chai
+            .expect(app.snake.position)
+            .to.deep.equal([rowIndex, colIndex + 1]);
+          chai.expect(app.grid[rowIndex][colIndex + 1]).to.equal("snake");
+        }
+      });
+    });
   });
 
   it("moveHeadTo correctly moves head one tile up", () => {
-    gridMethods.initialize();
-    snakeMethods.initialize();
+    app.grid.forEach((row, rowIndex) => {
+      row.forEach((tile, colIndex) => {
+        gridMethods.initialize();
 
-    snakeMethods.moveHeadTo([-1, 0]);
+        if (rowIndex >= 1) {
+          app.snake = {
+            position: [rowIndex, colIndex],
+            next: 0,
+          };
 
-    chai.expect(app.snake.position).to.deep.equal([19, 20]);
-    chai.expect(app.grid[19][20]).to.equal("snake");
+          snakeMethods.moveHeadTo([-1, 0]);
+
+          chai
+            .expect(app.snake.position)
+            .to.deep.equal([rowIndex - 1, colIndex]);
+          chai.expect(app.grid[rowIndex - 1][colIndex]).to.equal("snake");
+        }
+      });
+    });
   });
 
   it("moveHeadTo correctly moves head one tile down", () => {
-    gridMethods.initialize();
-    snakeMethods.initialize();
+    app.grid.forEach((row, rowIndex) => {
+      row.forEach((tile, colIndex) => {
+        gridMethods.initialize();
 
-    snakeMethods.moveHeadTo([1, 0]);
+        if (rowIndex <= HEIGHT - 2) {
+          app.snake = {
+            position: [rowIndex, colIndex],
+            next: 0,
+          };
 
-    chai.expect(app.snake.position).to.deep.equal([21, 20]);
-    chai.expect(app.grid[21][20]).to.equal("snake");
+          snakeMethods.moveHeadTo([1, 0]);
+
+          chai
+            .expect(app.snake.position)
+            .to.deep.equal([rowIndex + 1, colIndex]);
+          chai.expect(app.grid[rowIndex + 1][colIndex]).to.equal("snake");
+        }
+      });
+    });
   });
 
   it("moveHeadTo correctly moves head one tile to the left", () => {
-    gridMethods.initialize();
-    app.snake = {
-      position: [20, 20],
-      next: {
-        position: [20, 21],
-        next: {
-          position: [20, 22],
-          next: {
-            position: [20, 23],
+    app.grid.forEach((row, rowIndex) => {
+      row.forEach((tile, colIndex) => {
+        gridMethods.initialize();
+
+        if (colIndex >= 1) {
+          app.snake = {
+            position: [rowIndex, colIndex],
             next: 0,
-          },
-        },
-      },
-    };
-    snakeMethods.placeOnGrid(app.snake);
+          };
 
-    snakeMethods.moveHeadTo([0, -1]);
+          snakeMethods.moveHeadTo([0, -1]);
 
-    chai.expect(app.snake.position).to.deep.equal([20, 19]);
-    chai.expect(app.grid[20][19]).to.equal("snake");
+          chai
+            .expect(app.snake.position)
+            .to.deep.equal([rowIndex, colIndex - 1]);
+          chai.expect(app.grid[rowIndex][colIndex - 1]).to.equal("snake");
+        }
+      });
+    });
   });
 
   it("snakeMethods.removeTail removes last tail of snake", () => {
     gridMethods.initialize();
-    snakeMethods.initialize();
+    app.grid.forEach((row, rowIndex) => {
+      row.forEach((col, colIndex) => {
+        if (colIndex >= 3) {
+          app.snake = snakeMethods.create(rowIndex, colIndex, SNAKE_START_LEN);
+          snakeMethods.placeOnGrid(app.snake);
 
-    snakeMethods.removeTail();
+          snakeMethods.removeTail();
 
-    chai.expect(app.grid[20][17]).to.equal("blank");
-    chai.expect(app.snake.next.next.next).to.equal(0);
+          chai.expect(app.grid[rowIndex][colIndex - 3]).to.equal("blank");
+          chai.expect(app.snake.next.next.next).to.equal(0);
+        }
+      });
+    });
   });
 });
+
+const randomValue = () => {
+  switch (Math.floor(Math.random() * 3)) {
+    case 0:
+      return "blank";
+    case 1:
+      return "snake";
+    case 2:
+      return "food";
+  }
+};
+
+const directions = {
+  up: [-1, 0],
+  down: [1, 0],
+  left: [0, -1],
+  right: [0, 1],
+};
