@@ -1,9 +1,9 @@
-const HEIGHT = 40;
-const WIDTH = 40;
+const HEIGHT = 20;
+const WIDTH = 30;
 const SNAKESTARTLEN = 4;
 const GRIDSIZE = 10;
-const SCOREINTERVALFORSPEEDINCREMENT = 10;
-const SPEEDDECREMENT = 5;
+const SCOREINTERVALFORSPEEDINCREMENT = 5;
+const SPEEDDECREMENT = 15;
 const SPEEDCOMPOUNDFACTOR = 1.05;
 const LOG = true;
 const app = {
@@ -320,8 +320,10 @@ const gameMethods = {
     app.score = snakeMethods.length() - SNAKESTARTLEN;
   },
   updateSpeed() {
+    if (LOG) console.log("speed update function");
     if (app.score % SCOREINTERVALFORSPEEDINCREMENT === 0) {
-      if (app.score > SPEEDDECREMENT + 1) {
+      if (LOG) console.log("current speed: ", app.speed);
+      if (app.speed > SPEEDDECREMENT + 1) {
         app.speed -= SPEEDDECREMENT;
       } else {
         app.speed /= SPEEDCOMPOUNDFACTOR;
