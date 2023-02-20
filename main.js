@@ -5,12 +5,12 @@ const GRIDSIZE = 10;
 const SCOREINTERVALFORSPEEDINCREMENT = 10;
 const SPEEDDECREMENT = 5;
 const SPEEDCOMPOUNDFACTOR = 1.05;
-const LOG = false;
+const LOG = true;
 const app = {
   speed: 150,
   direction: [0, 1],
-  inputTaken: false,
-  screen: "welcome",
+  inputQueue: [],
+  screen: "game",
   playerName: "",
   leaderboard: [
     { name: "Rizvan", score: 10 },
@@ -172,6 +172,7 @@ const snakeMethods = {
     return app.grid[nextRow][nextCol];
   },
   move() {
+    snakeMethods.updateDirection();
     const nextTile = snakeMethods.nextTile();
 
     if (nextTile === "food") {
@@ -190,19 +191,41 @@ const snakeMethods = {
       return gameMethods.endGame();
     }
 
-    app.inputTaken = false;
     render.game();
     setTimeout(snakeMethods.move, app.speed);
   },
-  changeDirection(keyDownEvent) {
+  updateDirection() {
+    if (app.inputQueue.length > 0) {
+      app.direction = app.inputQueue[0];
+      app.inputQueue.splice(0, 1);
+      if (LOG)
+        console.log(
+          "input removed from queue. Current queue: ",
+          app.inputQueue
+        );
+    }
+  },
+  addNextDirection(keyDownEvent) {
     if (app.screen === "game") {
+      if (LOG) console.log("KEYDOWN NOW");
       keyDownEvent.preventDefault();
-      if (!app.inputTaken) {
-        const newDirection = snakeMethods.keyToDir(keyDownEvent.code);
-        if (newDirection) {
-          if (snakeMethods.isValidChange(newDirection, app.direction)) {
-            app.direction = newDirection;
-            app.inputTaken = true;
+      const nextDirection = snakeMethods.keyToDir(keyDownEvent.code);
+      if (nextDirection) {
+        if (app.inputQueue.length < 2) {
+          let currentDirection;
+          if (app.inputQueue.length > 0) {
+            currentDirection = app.inputQueue[app.inputQueue.length - 1];
+          } else {
+            currentDirection = app.direction;
+          }
+          if (snakeMethods.isValidChange(nextDirection, currentDirection)) {
+            app.direction = nextDirection;
+            app.inputQueue.push(nextDirection);
+            if (LOG)
+              console.log(
+                "input added to queue. current queue: ",
+                app.inputQueue
+              );
           }
         }
       }
@@ -327,7 +350,7 @@ const gameMethods = {
 };
 
 //event listeners
-page.addEventListener("keydown", snakeMethods.changeDirection);
+page.addEventListener("keydown", snakeMethods.addNextDirection);
 start.addEventListener("click", gameMethods.initialize);
 
 if (app.screen !== "welcome") gameMethods.initialize();
