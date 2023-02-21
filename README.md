@@ -5,6 +5,8 @@ Built using: HTML, Javascript, CSS
 
 This is a classic game of snake designed and implemented using HTML, CSS, and Javascript as a submission for the [Software Engineering Immersive Bootcamp](https://generalassemb.ly/education/software-engineering-immersive/singapore) run by General Assembly. 
 
+### [Play the game here](https://rizvan93.github.io/snake/index.html).
+
 I chose this game to demonstrate my understanding of the various features of HTML, CSS, and Javascript, such as:
 * Model-View-Controller architectural approach
 * DOM manipulation
@@ -25,7 +27,7 @@ I chose this game to demonstrate my understanding of the various features of HTM
 
 ## Game Rules
 
-I built the rules of my memory of how this game works. The player has to control a snake using the four arrow keys on the keyboard, and guide it towards randomly generated food while avoiding the walls and its own body. The speed and length of the snake increases as more food is eaten, and the game ends if the snake hits its own body or the walls. [Play the game here](https://rizvan93.github.io/snake/index.html). 
+I built the rules of my memory of how this game works. The player has to control a snake using the four arrow keys on the keyboard, and guide it towards randomly generated food while avoiding the walls and its own body. The speed and length of the snake increases as more food is eaten, and the game ends if the snake hits its own body or the walls. 
 
 ## Wireframe & User Stories
 
