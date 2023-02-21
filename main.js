@@ -10,7 +10,7 @@ const app = {
   speed: 150,
   direction: [0, 1],
   inputQueue: [],
-  screen: "game",
+  screen: "welcome",
   playerName: "",
   leaderboard: [
     { name: "Rizvan", score: 10 },
