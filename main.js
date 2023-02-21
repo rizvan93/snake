@@ -205,32 +205,28 @@ const snakeMethods = {
         );
     }
   },
-  addNextDirection(keyDownEvent) {
-    if (app.screen === "game") {
-      if (LOG) console.log("KEYDOWN NOW");
-      keyDownEvent.preventDefault();
-      const nextDirection = snakeMethods.keyToDir(keyDownEvent.code);
-      if (nextDirection) {
-        if (app.inputQueue.length < 2) {
-          let currentDirection;
-          if (app.inputQueue.length > 0) {
-            currentDirection = app.inputQueue[app.inputQueue.length - 1];
-          } else {
-            currentDirection = app.direction;
-          }
-          if (snakeMethods.isValidChange(nextDirection, currentDirection)) {
-            app.direction = nextDirection;
-            app.inputQueue.push(nextDirection);
-            if (LOG)
-              console.log(
-                "input added to queue. current queue: ",
-                app.inputQueue
-              );
-          }
+  addNextDirection(nextDirection) {
+    if (nextDirection) {
+      if (app.inputQueue.length < 2) {
+        let currentDirection;
+        if (app.inputQueue.length > 0) {
+          currentDirection = app.inputQueue[app.inputQueue.length - 1];
+        } else {
+          currentDirection = app.direction;
+        }
+        if (snakeMethods.isValidChange(nextDirection, currentDirection)) {
+          app.direction = nextDirection;
+          app.inputQueue.push(nextDirection);
+          if (LOG)
+            console.log(
+              "input added to queue. current queue: ",
+              app.inputQueue
+            );
         }
       }
     }
   },
+
   isValidChange(dir1, dir2) {
     if (Math.abs(dir1[0]) - Math.abs(dir2[0])) {
       if (Math.abs(dir1[1]) - Math.abs(dir2[1])) {
@@ -350,10 +346,17 @@ const gameMethods = {
     app.playerName = "";
     render.all();
   },
+  onKeyDownEvent(keyDownEvent) {
+    if (app.screen === "game") {
+      if (LOG) console.log("KEYDOWN NOW");
+      keyDownEvent.preventDefault();
+      snakeMethods.addNextDirection(snakeMethods.keyToDir(keyDownEvent.code));
+    }
+  },
 };
 
 //event listeners
-page.addEventListener("keydown", snakeMethods.addNextDirection);
+page.addEventListener("keydown", gameMethods.onKeyDownEvent);
 start.addEventListener("click", gameMethods.initialize);
 
 if (app.screen !== "welcome") gameMethods.initialize();
