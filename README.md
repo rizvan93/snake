@@ -17,14 +17,15 @@ I chose this game to demonstrate my understanding of the various features of HTM
 * Windows Powershell
 * Visual Studio Code
   * Prettier extension for formatting
+* Mocha and Chai for testing
 
 ## Timeframe
 
-3 working days
+5 working days
 
 ## Game Rules
 
-I built the rules of my memory of how this game works. The player has to control a snake using the four arrow keys on the keyboard, and guide it towards randomly generated food while avoiding the walls and its own body. The speed and length of the snake increases as more food is eaten, and the game ends if the snake hits its own body or the walls.
+I built the rules of my memory of how this game works. The player has to control a snake using the four arrow keys on the keyboard, and guide it towards randomly generated food while avoiding the walls and its own body. The speed and length of the snake increases as more food is eaten, and the game ends if the snake hits its own body or the walls. [Play the game here](https://rizvan93.github.io/snake/index.html). 
 
 ## Wireframe & User Stories
 
@@ -61,8 +62,9 @@ The game is designed and implemented using a model-view-controller architectural
 3. Add game logic (1 day)
 4. Add score, welcome screen, and leaderboard (1/2 day)
 5. Style and add sound (1/2 day)
+6. Test using mocha and chai (2 days)
 
-#### _Model_
+### _Model_
 
 The game stores its data within an "app" object, which has four categories of data: game state, grid, snake, and leaderboard
 
@@ -124,7 +126,7 @@ const snakeMethods = {
 }
 ```
 
-#### _View_
+### _View_
 
 The view of the user is arranged into a header, main box, and side box using CSS Grid. Depending on the state of the app.screen property, the main box is rendered to show the welcome or game screens. 
 
@@ -171,7 +173,7 @@ const render = {
 
 The view is also updated to show the welcome screen, score, game-over message, and leaderboard. 
 
-#### _Controller_
+### _Controller_
 
 The first controller to move the snake runs without the user's input. It takes the direction from the game state model and determines the appropriate action depending on the next tile the snake steps on. These are:  
 1. If the next tile is blank: move the snake to the next tile (update snake model)
@@ -182,12 +184,13 @@ The controller then calls itself at a fixed interval to continue moving the snak
 ```
 const snakeMethods = {
   move() {
+    snakeMethods.updateDirection();
     const nextTile = snakeMethods.nextTile();
 
     if (nextTile === "food") {
       snakeMethods.moveHeadTo(app.direction);
       if (!gridMethods.generateFood()) {
-        if (LOG) console.log("win condition");
+        gameMethods.endGame();
         return;
       }
       gameMethods.updateScore();
@@ -197,12 +200,7 @@ const snakeMethods = {
       snakeMethods.removeTail();
     } else {
       return gameMethods.endGame();
-    }
-
-    app.inputTaken = false;
-    render.game();
-    setTimeout(snakeMethods.move, app.speed);
-  },
+    },
   
   moveHeadTo(direction) {
     const newSnakehead = {
@@ -227,30 +225,52 @@ const snakeMethods = {
 }
 ```
 
-The controller also listens for a key down event via an event listener, which changes the game state model when triggered. 
+The controller also listens for a key down event via an event listener, which changes the game state model when triggered. To improve input responsiveness, for up to two user inputs can be stored before the game state model is changed. User inputs are also screened for validity (only 90$deg; turns are allowed) before being accepted to change the game state model. 
 
 ```
-page.addEventListener("keydown", snakeMethods.changeDirection);
+page.addEventListener("keydown", gameMethods.onKeyDownEvent);
 
-const snakeMethods = {
-  changeDirection(keyDownEvent) {
+gameMethods = {
+  onKeyDownEvent(keyDownEvent) {
     if (app.screen === "game") {
       keyDownEvent.preventDefault();
-      if (!app.inputTaken) {
-        const newDirection = snakeMethods.keyToDir(keyDownEvent.code);
-        if (newDirection) {
-          if (snakeMethods.isValidChange(newDirection, app.direction)) {
-            app.direction = newDirection;
-            app.inputTaken = true;
-          }
+      snakeMethods.addNextDirection(snakeMethods.keyToDir(keyDownEvent.code));
+    }
+  },
+}
+
+snakeMethods = {
+  addNextDirection(nextDirection) {
+    if (nextDirection) {
+      if (app.inputQueue.length < 2) {
+        let currentDirection;
+        if (app.inputQueue.length > 0) {
+          currentDirection = app.inputQueue[app.inputQueue.length - 1];
+        } else {
+          currentDirection = app.direction;
+        }
+        if (snakeMethods.isValidChange(nextDirection, currentDirection)) {
+          app.direction = nextDirection;
+          app.inputQueue.push(nextDirection);
         }
       }
+    }
+  },
+
+  updateDirection() {
+    if (app.inputQueue.length > 0) {
+      app.direction = app.inputQueue[0];
+      app.inputQueue.splice(0, 1);
     }
   },
 }
 ```
 
 The controller also includes several other functions, such as to check the validity of a directional change, generate food, speed up the snake, but these are excluded from this README for brevity. 
+
+### _Testing_
+
+A testing script was also implemented using Mocha and Chai libraries. This script tests and documents the expected input and outputs for the various functions used for this game. Functions manipulating the Document Object Model were not tested in this script. See the [test resuls here](https://rizvan93.github.io/snake/testing.html). 
 
 ## Future Developments & Improvements
 
@@ -262,5 +282,3 @@ Potential improvements for the future include:
 ## Summary
 
 This was my first attempt at creating a software product within a tight timeline. Nonetheless, by consientiously applying the skills and knowledge I learnt in the first two weeks of General Assembly's Software Engineering Immersive, I was able to implement a workable game of snake which I must admit is rather fun to play. 
-
-## Asset Attributions
