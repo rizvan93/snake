@@ -336,6 +336,7 @@ const gameMethods = {
     app.screen = "game";
     app.playerName = document.querySelector("#player-name").value || "Player 1";
     app.direction = [0, 1];
+    app.score = 0;
     if (LOG) console.log(app.playerName);
     gridMethods.initialize();
     snakeMethods.initialize();
