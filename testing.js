@@ -1,10 +1,4 @@
-it("test statement, adds one and two", () => {
-  const result = 1 + 2;
-
-  chai.expect(result).to.equal(3);
-});
-
-describe("initialize game", () => {
+describe("Initialize game", () => {
   describe("initialize grid with blank values", () => {
     it("initializes grid with correct HEIGHT", () => {
       gridMethods.initialize();
@@ -108,7 +102,6 @@ describe("initialize game", () => {
       }
     });
   });
-
   describe("Generate a food on one of the blanks on the grid", () => {
     it("gridMethods.findItems('blank') finds correct number of blanks on the grid", () => {
       gridMethods.initialize();
@@ -171,13 +164,10 @@ describe("Move Snake", () => {
           [1, 0],
           [-1, 0],
         ].forEach((nextDirection) => {
-          if (currentDirection[0] === 0 && nextDirection[0] === 0) {
-            chai
-              .expect(
-                snakeMethods.isValidChange(currentDirection, nextDirection)
-              )
-              .to.equal(false);
-          } else if (currentDirection[1] === 0 && nextDirection[1] === 0) {
+          if (
+            (currentDirection[0] === 0 && nextDirection[0] === 0) ||
+            (currentDirection[1] === 0 && nextDirection[1] === 0)
+          ) {
             chai
               .expect(
                 snakeMethods.isValidChange(currentDirection, nextDirection)
@@ -194,7 +184,7 @@ describe("Move Snake", () => {
       });
     });
 
-    it("snakeMethods.updateDirection correctly changes to the next direction when inputQueue.length = 1", () => {
+    it("snakeMethods.updateDirection() correctly changes to the next direction when inputQueue.length is 1", () => {
       [
         [0, 1],
         [0, -1],
@@ -220,7 +210,7 @@ describe("Move Snake", () => {
       });
     });
 
-    it("snakeMethods.updateDirection correctly changes to the next directions in sequence when inputQueue.length = 2", () => {
+    it("snakeMethods.updateDirection() correctly changes to the next directions in sequence when inputQueue.length is 2", () => {
       [
         [0, 1],
         [0, -1],
@@ -262,7 +252,7 @@ describe("Move Snake", () => {
       });
     });
 
-    it("snakeMethods.updateDirection correctly removes the first item from inputQueue after changing direction", () => {
+    it("snakeMethods.updateDirection() correctly removes the first item from inputQueue after changing direction", () => {
       [
         [0, 1],
         [0, -1],
@@ -291,6 +281,84 @@ describe("Move Snake", () => {
             chai.expect(app.inputQueue.length).to.equal(0);
           }
         });
+      });
+    });
+
+    it("snakeMethods.addNextDirection(nextDirection) correctly adds user input to the inputQueue when inputQueue.length is 0", () => {
+      [
+        [0, 1],
+        [0, -1],
+        [1, 0],
+        [-1, 0],
+      ].forEach((currentDirection) => {
+        [
+          [0, 1],
+          [0, -1],
+          [1, 0],
+          [-1, 0],
+        ].forEach((nextDirection) => {
+          app.direction = currentDirection;
+          app.inputQueue = [];
+
+          snakeMethods.addNextDirection(nextDirection);
+
+          if (
+            (currentDirection[0] === 0 && nextDirection[0] === 0) ||
+            (currentDirection[1] === 0 && nextDirection[1] === 0)
+          ) {
+            chai.expect(app.inputQueue.length).to.equal(0);
+          } else {
+            chai.expect(app.inputQueue.length).to.equal(1);
+            chai.expect(app.inputQueue[0]).to.deep.equal(nextDirection);
+          }
+        });
+      });
+    });
+
+    it("snakeMethods.addNextDirection(nextDirection) correctly adds user input to the inputQueue when inputQueue.length is 1", () => {
+      [
+        [0, 1],
+        [0, -1],
+        [1, 0],
+        [-1, 0],
+      ].forEach((currentDirection) => {
+        [
+          [0, 1],
+          [0, -1],
+          [1, 0],
+          [-1, 0],
+        ].forEach((nextDirection) => {
+          app.inputQueue = [currentDirection];
+
+          snakeMethods.addNextDirection(nextDirection);
+
+          if (
+            (currentDirection[0] === 0 && nextDirection[0] === 0) ||
+            (currentDirection[1] === 0 && nextDirection[1] === 0)
+          ) {
+            chai.expect(app.inputQueue.length).to.equal(1);
+            chai.expect(app.inputQueue[0]).to.deep.equal(currentDirection);
+          } else {
+            chai.expect(app.inputQueue.length).to.equal(2);
+            chai.expect(app.inputQueue[1]).to.deep.equal(nextDirection);
+          }
+        });
+      });
+    });
+
+    it("snakeMethods.addNextDirection(nextDirection) does not accept new user input when inputQueue.length is 2", () => {
+      app.inputQueue = [
+        [1, 0],
+        [0, -1],
+      ];
+
+      [([0, 1], [0, -1], [1, 0], [-1, 0])].forEach((nextDirection) => {
+        snakeMethods.addNextDirection(nextDirection);
+
+        chai.expect(app.inputQueue).to.deep.equal([
+          [1, 0],
+          [0, -1],
+        ]);
       });
     });
   });
@@ -538,6 +606,104 @@ describe("Move Snake", () => {
             chai.expect(app.snake.next.next.next).to.equal(0);
           }
         });
+      });
+    });
+  });
+});
+
+describe("Update Score, Speed, and Leaderboard", () => {
+  describe("update current score as snake length increases", () => {
+    it("snakeMethods.length(snake) correctly determines the length of the snake", () => {
+      for (let length = 1; length < 101; length++) {
+        const newSnake = snakeMethods.create(0, length - 1, length);
+
+        chai.expect(snakeMethods.length(newSnake)).to.equal(length);
+      }
+    });
+
+    it("gameMethods.updateScore() correctly updates model with the current score", () => {
+      for (let length = SNAKE_START_LEN; length < 101; length++) {
+        app.snake = snakeMethods.create(0, 0, length);
+        gameMethods.updateScore();
+
+        chai.expect(app.score).to.equal(length - SNAKE_START_LEN);
+      }
+    });
+  });
+  describe("update speed with increasing score", () => {
+    it("gameMethods.updateSpeed() correctly increases model speed while the refresh rate is more than 1ms", () => {
+      let previousSpeed = 500;
+      app.speed = previousSpeed;
+      for (let i = 1; i < 300; i++) {
+        if (app.speed > 1) {
+          app.score = i;
+          gameMethods.updateSpeed();
+
+          if (i % SCORE_INTERVAL_FOR_SPEED_INCREASE === 0) {
+            if (previousSpeed >= SPEED_DECREMENT) {
+              chai.expect(app.speed).to.equal(previousSpeed - SPEED_DECREMENT);
+            } else {
+              chai.expect(app.speed).to.equal(1);
+            }
+          } else {
+            chai.expect(app.speed).to.equal(previousSpeed);
+          }
+          previousSpeed = app.speed;
+        }
+      }
+    });
+    it("gameMethods.updateSpeed() correctly updates model speed when the refresh rate is less than 1ms", () => {
+      let previousSpeed = 1;
+      app.speed = previousSpeed;
+      for (let i = 1; i < 300; i++) {
+        app.score = i;
+        gameMethods.updateSpeed();
+
+        if (i % SCORE_INTERVAL_FOR_SPEED_INCREASE === 0) {
+          chai
+            .expect(app.speed)
+            .to.equal(previousSpeed / SPEED_COMPOUND_FACTOR);
+        } else {
+          chai.expect(app.speed).to.equal(previousSpeed);
+        }
+        previousSpeed = app.speed;
+      }
+    });
+  });
+
+  describe("update leaderboard after game ends", () => {
+    it("gameMethods.trimLeaderboard() saves top 10 scores in the leaderboard", () => {
+      app.leaderboard = [];
+      for (let i = 15; i > 0; i--) {
+        app.leaderboard.push({ name: `Player ${i}`, score: i });
+      }
+      gameMethods.trimLeaderboard();
+
+      chai.expect(app.leaderboard.length).to.equal(10);
+      for (let i = 0; i < 9; i++) {
+        chai
+          .expect(app.leaderboard[i].score)
+          .to.equal(app.leaderboard[i + 1].score + 1);
+      }
+    });
+    it("updateLeaderboard() adds player name and score to leaderboard", () => {
+      [
+        { player: "Top Player", score: 20 },
+        { player: "Mid Player", score: 15 },
+        { player: "Poor Player", score: 5 },
+      ].forEach((entry) => {
+        app.leaderboard = [];
+        for (let i = 10; i < 20; i++) {
+          app.leaderboard.push({ name: `Player ${i - 9}`, score: i });
+        }
+        app.playerName = entry.player;
+        app.score = entry.score;
+
+        gameMethods.updateLeaderboard();
+        for (let i = 0; i < 9; i++)
+          chai
+            .expect(app.leaderboard[i].score)
+            .to.be.at.least(app.leaderboard[i + 1].score);
       });
     });
   });

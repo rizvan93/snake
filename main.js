@@ -93,6 +93,10 @@ const render = {
     });
     this.score();
   },
+  gameOver() {
+    restart.addEventListener("click", gameMethods.initialize);
+    returnHome.addEventListener("click", gameMethods.returnHome);
+  },
   score() {
     const scoreLog = document.querySelector("#score");
     if (!app.score) app.score = 0;
@@ -294,22 +298,21 @@ const gridMethods = {
 const gameMethods = {
   trimLeaderboard() {
     app.leaderboard.sort((a, b) => b.score - a.score);
-    app.leaderboard = app.leaderboard.map((entry, i) => {
-      if (i < 10) return entry;
-    });
+    app.leaderboard.splice(10, app.leaderboard.length - 10);
     if (LOG) console.log(`update leaderboard: ${app.leaderboard}`);
   },
-  endGame() {
+  updateLeaderboard() {
     if (app.score > 0) {
       const entry = { name: app.playerName, score: app.score };
       app.leaderboard.push(entry);
       this.trimLeaderboard();
-      render.leaderboard();
     }
+  },
+  endGame() {
+    this.updateLeaderboard();
     app.screen = "game-over";
     render.all();
-    restart.addEventListener("click", gameMethods.initialize);
-    returnHome.addEventListener("click", gameMethods.returnHome);
+    render.gameOver();
     if (LOG) console.log("game over");
   },
   updateScore() {
@@ -319,8 +322,10 @@ const gameMethods = {
     if (LOG) console.log("speed update function");
     if (app.score % SCORE_INTERVAL_FOR_SPEED_INCREASE === 0) {
       if (LOG) console.log("current speed: ", app.speed);
-      if (app.speed > SPEED_DECREMENT + 1) {
+      if (app.speed > SPEED_DECREMENT) {
         app.speed -= SPEED_DECREMENT;
+      } else if (app.speed <= SPEED_DECREMENT && app.speed > 1) {
+        app.speed = 1;
       } else {
         app.speed /= SPEED_COMPOUND_FACTOR;
       }
