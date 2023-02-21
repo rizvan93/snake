@@ -1,7 +1,7 @@
 const HEIGHT = 20;
 const WIDTH = 30;
 const SNAKE_START_LEN = 4;
-const GRIDSIZE = 10;
+const GRID_SIZE = 10;
 const SCORE_INTERVAL_FOR_SPEED_INCREASE = 5;
 const SPEED_DECREMENT = 15;
 const SPEED_COMPOUND_FACTOR = 1.05;
@@ -85,8 +85,8 @@ const render = {
       modelRow.forEach((value, j) => {
         const box = document.createElement("td");
         box.setAttribute("class", value);
-        box.style.height = `${GRIDSIZE}px`;
-        box.style.width = `${GRIDSIZE}px`;
+        box.style.height = `${GRID_SIZE}px`;
+        box.style.width = `${GRID_SIZE}px`;
         row.append(this.addBoardBorders(box, i, j));
       });
       table.append(row);
