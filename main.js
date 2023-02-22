@@ -8,7 +8,11 @@ const SPEED_DECREMENT = 15;
 const SPEED_COMPOUND_FACTOR = 1.05;
 const START_SPEED = 200;
 const LOG = false;
-
+const GAME_SOUNDS = {
+  start: "https://cdn.freesound.org/previews/368/368691_4930962-lq.mp3",
+  eat: "https://cdn.freesound.org/previews/570/570336_6384533-lq.mp3",
+  gameOver: "https://cdn.freesound.org/previews/76/76376_877451-lq.mp3",
+};
 // game state model
 const app = {
   speed: START_SPEED,
@@ -16,11 +20,7 @@ const app = {
   inputQueue: [],
   screen: "welcome",
   playerName: "",
-  leaderboard: [
-    { name: "Rizvan", score: 10 },
-    { name: "Faizal", score: 100 },
-    { name: "Ida", score: 50 },
-  ],
+  leaderboard: [],
 };
 
 //cached elements
@@ -31,6 +31,7 @@ const start = document.querySelector("#start");
 const leaderboard = document.querySelector("#leaderboard");
 const restart = document.querySelector("#restart");
 const returnHome = document.querySelector("#return-home");
+const audioPlayer = new Audio();
 
 //functions
 
@@ -185,6 +186,7 @@ const snakeMethods = {
 
     if (nextTile === "food") {
       snakeMethods.moveHeadTo(app.direction);
+      gameMethods.playSound("eat");
       if (!gridMethods.generateFood()) {
         gameMethods.endGame();
         if (LOG) console.log("win condition");
@@ -317,6 +319,7 @@ const gameMethods = {
     app.screen = "game-over";
     render.all();
     render.gameOver();
+    gameMethods.playSound("gameOver");
     if (LOG) console.log("game over");
   },
   updateScore() {
@@ -348,6 +351,7 @@ const gameMethods = {
     snakeMethods.initialize();
     gridMethods.generateFood();
     render.all();
+    gameMethods.playSound("start");
     setTimeout(snakeMethods.move, app.speed);
   },
   returnHome(event) {
@@ -362,6 +366,10 @@ const gameMethods = {
       keyDownEvent.preventDefault();
       snakeMethods.addNextDirection(snakeMethods.keyToDir(keyDownEvent.code));
     }
+  },
+  playSound(soundName) {
+    audioPlayer.src = GAME_SOUNDS[soundName];
+    audioPlayer.play();
   },
 };
 
