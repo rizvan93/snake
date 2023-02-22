@@ -31,9 +31,9 @@ I built the rules of my memory of how this game works. The player has to control
 
 ## Wireframe & User Stories
 
-![Wireframe of Welcome Screen] (.\resources\welcome_wireframe.jpeg)
+![Wireframe of Welcome Screen](https://raw.githubusercontent.com/rizvan93/snake/main/resources/welcome_wireframe.jpeg)
 
-![Wireframe of Snake Game](.\resources\game_wireframe.jpeg)
+![Wireframe of Snake Game](https://raw.githubusercontent.com/rizvan93/snake/main/resources/game_wireframe.jpeg)
 
 | **When a user...**              | **...this should happen**                               |
 |--------------------             |-----------------------------                            |
