@@ -31,9 +31,9 @@ I built the rules of my memory of how this game works. The player has to control
 
 ## Wireframe & User Stories
 
-![Wireframe of Welcome Screen] ()
+![Wireframe of Welcome Screen] (.\resources\welcome_wireframe.jpeg)
 
-![Wireframe of Snake Game]()
+![Wireframe of Snake Game](.\resources\game_wireframe.jpeg)
 
 | **When a user...**              | **...this should happen**                               |
 |--------------------             |-----------------------------                            |
@@ -272,7 +272,7 @@ The controller also includes several other functions, such as to check the valid
 
 ### _Testing_
 
-A testing script was also implemented using Mocha and Chai libraries. This script tests and documents the expected input and outputs for the various functions used for this game. Functions manipulating the Document Object Model were not tested in this script. See the [test resuls here](https://rizvan93.github.io/snake/testing.html). 
+A testing script was also implemented using Mocha and Chai libraries. This script tests and documents the expected input and outputs for the various functions used for this game. Functions manipulating the Document Object Model were not tested in this script. See the [test results here](https://rizvan93.github.io/snake/testing.html). 
 
 ## Future Developments & Improvements
 
@@ -283,4 +283,4 @@ Potential improvements for the future include:
 
 ## Summary
 
-This was my first attempt at creating a software product within a tight timeline. Nonetheless, by consientiously applying the skills and knowledge I learnt in the first two weeks of General Assembly's Software Engineering Immersive, I was able to implement a workable game of snake which I must admit is rather fun to play. 
+This was my first attempt at creating a software product within a tight timeline. Nonetheless, by conscientiously applying the skills and knowledge I learnt in the first two weeks of General Assembly's Software Engineering Immersive, I was able to implement a workable game of snake which I must admit is rather fun to play. 
