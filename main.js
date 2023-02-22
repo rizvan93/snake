@@ -1,3 +1,4 @@
+// constants
 const HEIGHT = 20;
 const WIDTH = 30;
 const SNAKE_START_LEN = 4;
@@ -5,9 +6,12 @@ const GRID_SIZE = 10;
 const SCORE_INTERVAL_FOR_SPEED_INCREASE = 5;
 const SPEED_DECREMENT = 15;
 const SPEED_COMPOUND_FACTOR = 1.05;
+const START_SPEED = 200;
 const LOG = false;
+
+// game state model
 const app = {
-  speed: 150,
+  speed: START_SPEED,
   direction: [0, 1],
   inputQueue: [],
   screen: "welcome",
@@ -337,6 +341,7 @@ const gameMethods = {
     app.screen = "game";
     app.playerName = document.querySelector("#player-name").value || "Player 1";
     app.direction = [0, 1];
+    app.speed = START_SPEED;
     app.score = 0;
     if (LOG) console.log(app.playerName);
     gridMethods.initialize();
