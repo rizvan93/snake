@@ -31,10 +31,13 @@ I built the rules of my memory of how this game works. The player has to control
 
 ## Wireframe & User Stories
 
+#### Wireframe of Welcome Scren
 ![Wireframe of Welcome Screen](https://raw.githubusercontent.com/rizvan93/snake/main/resources/welcome_wireframe.jpeg)
 
+#### Wireframe of Game Screen
 ![Wireframe of Snake Game](https://raw.githubusercontent.com/rizvan93/snake/main/resources/game_wireframe.jpeg)
 
+#### User Stories
 | **When a user...**              | **...this should happen**                               |
 |--------------------             |-----------------------------                            |
 | loads the page                  | sees a welcome screen                                   |
