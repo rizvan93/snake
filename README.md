@@ -75,7 +75,7 @@ The game stores its data within an "app" object, which has four categories of da
 
 The game state, namely screen, speed, direction, input status, and score are stored as properties of the app object, and are initialized in the main script. These values are updated by the controller during play. 
 
-```
+```Javascript
 const app = {  
   speed: 100,  
   direction: [0, 1],  
@@ -85,7 +85,7 @@ const app = {
 
 The grid, itself a two-dimensional array, is stored as a property of the app object. It is initialized when the game starts and contains one of three values: "blank", "snake", or "food". The grid is updated by the controller and is used to update the view seen by the user. The height and width of the grid are set as constants within the script. 
 
-```
+```Javascript
 const gridMethods = {
   initialize () {
   const grid = [];  
@@ -105,7 +105,7 @@ The snake is a linked list where each link is an object containing (a) the posit
 
 To ensure no conflicts between the snake and grid models, the snake model is used to update the grid model. 
 
-```
+```Javascript
 const snakeMethods = {
   initialize() {
     const snakeheadRow = Math.floor(HEIGHT / 2);
@@ -135,7 +135,7 @@ const snakeMethods = {
 
 The view of the user is arranged into a header, main box, and side box using CSS Grid. Depending on the state of the app.screen property, the main box is rendered to show the welcome or game screens. 
 
-```
+```Javascript
 const render = {
   mainBox() {
     document.querySelectorAll(".main-box").forEach((divBox) => {
@@ -154,7 +154,7 @@ const render = {
 
 While the game screen is showing, the game is rendered to update to display the table based on the grid model, which itself is updated based on the snake model. To do this, the entire table is cleared and re-created each time the game is rendered. The class of each element is set to the value of the grid model ("blank", "food", "snake"), which is used to apply the repective CSS property to the element.
 
-```
+```Javascript
 const render = {
   game() {
     while (table.firstChild) {
@@ -186,7 +186,7 @@ The first controller to move the snake runs without the user's input. It takes t
 3. Otherwise (the next tile is either a snake body or wall): the game ends (update game state model) 
 The controller then calls itself at a fixed interval to continue moving the snake perpetually. 
 
-```
+```Javascript
 const snakeMethods = {
   move() {
     snakeMethods.updateDirection();
@@ -232,7 +232,7 @@ const snakeMethods = {
 
 The controller also listens for a key down event via an event listener, which changes the game state model when triggered. To improve input responsiveness, for up to two user inputs can be stored before the game state model is changed. User inputs are also screened for validity (only 90$deg; turns are allowed) before being accepted to change the game state model. 
 
-```
+```Javascript
 page.addEventListener("keydown", gameMethods.onKeyDownEvent);
 
 gameMethods = {
