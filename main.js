@@ -20,7 +20,18 @@ const app = {
   inputQueue: [],
   screen: "welcome",
   playerName: "",
-  leaderboard: [],
+  leaderboard: [
+    { name: "Player 1", score: 100 },
+    { name: "Player 2", score: 50 },
+    { name: "Player 3", score: 25 },
+    { name: "Player 4", score: 15 },
+    { name: "Player 5", score: 10 },
+    { name: "Player 6", score: 5 },
+    { name: "Player 7", score: 4 },
+    { name: "Player 8", score: 3 },
+    { name: "Player 9", score: 2 },
+    { name: "Player 10", score: 1 },
+  ],
 };
 
 //cached elements
